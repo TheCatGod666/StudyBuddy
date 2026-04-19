@@ -955,106 +955,59 @@ html {
     outline: none;
 }
 
-/* Timer Modal Responsive Fixes */
-@media (max-width: 550px) {
-    .modal-card {
-        max-width: 95% !important;
-        width: 95% !important;
-    }
-    
-    .timer-display {
-        font-size: 2.5rem !important;
-    }
-    
-    .timer-btn {
-        padding: 6px 12px !important;
-        font-size: 0.8rem !important;
-    }
-    
-    .custom-time-picker input {
-        width: 65px !important;
-        font-size: 0.8rem;
-    }
-    
-    .custom-time-picker span {
-        font-size: 0.8rem;
-    }
-    
-    .pill-btn {
-        padding: 0.4rem 0.8rem !important;
-        font-size: 0.7rem !important;
-    }
-    
-    .quick-time {
-        padding: 0.25rem 0.6rem !important;
-        font-size: 0.65rem !important;
-    }
-    
-    .preset-quick-select {
-        padding: 0.6rem;
-    }
+/* Timer Modal - Complete Fix for Scrolling */
+.modal-cute {
+    display: none;
+    position: fixed;
+    z-index: 2000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(249, 168, 212, 0.5);
+    backdrop-filter: blur(6px);
+    align-items: center;
+    justify-content: center;
+    overflow-y: auto;
+    padding: 20px;
 }
 
-@media (max-width: 400px) {
-    .timer-controls {
-        gap: 0.3rem !important;
-    }
-    
-    .timer-btn {
-        padding: 4px 8px !important;
-        font-size: 0.7rem !important;
-    }
-    
-    .custom-time-picker {
-        padding: 0.6rem;
-    }
-    
-    .custom-time-picker input {
-        width: 55px !important;
-    }
-    
-    .quick-time {
-        padding: 0.2rem 0.5rem !important;
-        font-size: 0.6rem !important;
-    }
-}
-
-/* Make modal scrollable if content overflows */
 .modal-card {
+    background: #fffef7;
+    border-radius: 56px;
+    max-width: 550px;
+    width: 100%;
     max-height: 90vh;
     overflow-y: auto;
+    box-shadow: 0 40px 60px #f0a6c6;
+    display: flex;
+    flex-direction: column;
 }
 
-/* Timer container improvements */
-.timer-container {
-    padding: 1rem;
+/* Ensure modal content is scrollable */
+.modal-card > div {
+    overflow-y: auto;
+    flex: 1;
 }
 
-.timer-controls {
-    gap: 0.8rem;
-}
-
-/* Better button wrapping */
-.action-pills,
-.timer-controls,
-.custom-time-picker div,
-.preset-quick-select div {
-    justify-content: center;
-}
-
-/* Scrollbar for modal if needed */
+/* Custom scrollbar for modal */
 .modal-card::-webkit-scrollbar {
-    width: 6px;
+    width: 8px;
 }
 
 .modal-card::-webkit-scrollbar-track {
     background: #ffe2f0;
     border-radius: 10px;
+    margin: 10px 0;
 }
 
 .modal-card::-webkit-scrollbar-thumb {
     background: #f472b6;
     border-radius: 10px;
+}
+
+.modal-card::-webkit-scrollbar-thumb:hover {
+    background: #ec4899;
 }
 
 .dark-mode .modal-card::-webkit-scrollbar-track {
@@ -1063,4 +1016,153 @@ html {
 
 .dark-mode .modal-card::-webkit-scrollbar-thumb {
     background: #c084fc;
+}
+
+/* Timer Container Styles */
+.timer-container {
+    background: linear-gradient(135deg, #f472b6, #c084fc);
+    border-radius: 20px;
+    padding: 20px 15px;
+    margin-bottom: 15px;
+    text-align: center;
+    color: white;
+}
+
+.timer-display {
+    font-size: 48px;
+    font-weight: 800;
+    font-family: monospace;
+    letter-spacing: 5px;
+    margin-bottom: 10px;
+}
+
+.timer-controls {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.timer-btn {
+    background: rgba(255,255,255,0.2);
+    border: none;
+    padding: 8px 20px;
+    border-radius: 30px;
+    color: white;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.2s;
+}
+
+.timer-btn:hover {
+    background: rgba(255,255,255,0.3);
+    transform: scale(1.05);
+}
+
+/* Custom Time Picker */
+.custom-time-picker {
+    background: rgba(255, 226, 240, 0.3);
+    border-radius: 28px;
+    padding: 15px;
+    margin: 15px 0;
+}
+
+.custom-time-picker label {
+    font-weight: 700;
+    color: #db2777;
+    display: block;
+    margin-bottom: 10px;
+}
+
+.custom-time-picker input {
+    text-align: center;
+    font-weight: 600;
+}
+
+/* Preset Quick Select */
+.preset-quick-select {
+    background: rgba(255, 248, 245, 0.5);
+    border-radius: 24px;
+    padding: 12px;
+    margin: 10px 0;
+}
+
+.quick-time {
+    padding: 6px 12px !important;
+    font-size: 0.75rem !important;
+    background: rgba(255, 255, 255, 0.8) !important;
+    margin: 3px;
+}
+
+.dark-mode .quick-time {
+    background: rgba(45, 45, 68, 0.8) !important;
+}
+
+.quick-time:hover {
+    transform: translateY(-2px) !important;
+}
+
+/* Mobile Responsive */
+@media (max-width: 600px) {
+    .modal-card {
+        max-width: 95%;
+        max-height: 85vh;
+    }
+    
+    .timer-display {
+        font-size: 36px;
+        letter-spacing: 3px;
+    }
+    
+    .timer-btn {
+        padding: 6px 15px;
+        font-size: 14px;
+    }
+    
+    .custom-time-picker input {
+        width: 70px !important;
+        font-size: 14px;
+    }
+    
+    .pill-btn {
+        padding: 5px 10px !important;
+        font-size: 11px !important;
+    }
+    
+    .quick-time {
+        padding: 4px 8px !important;
+        font-size: 11px !important;
+    }
+}
+
+@media (max-width: 450px) {
+    .modal-card {
+        max-height: 80vh;
+    }
+    
+    .timer-display {
+        font-size: 32px;
+    }
+    
+    .timer-controls {
+        gap: 5px;
+    }
+    
+    .timer-btn {
+        padding: 5px 10px;
+        font-size: 12px;
+    }
+    
+    .custom-time-picker {
+        padding: 10px;
+    }
+    
+    .custom-time-picker input {
+        width: 60px !important;
+        font-size: 12px;
+    }
+    
+    .preset-quick-select {
+        padding: 8px;
+    }
 }
