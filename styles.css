@@ -1166,3 +1166,83 @@ html {
         padding: 8px;
     }
 }
+
+/* Enhanced File Card Styles */
+.file-card-enhanced {
+    transition: all 0.2s ease;
+    border: 1px solid #ffe2f0;
+}
+
+.file-card-enhanced:hover {
+    transform: translateX(5px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    border-color: #f472b6;
+}
+
+.dark-mode .file-card-enhanced {
+    background: #2d2d44 !important;
+    border-color: #3d3d5c;
+}
+
+.dark-mode .file-card-enhanced:hover {
+    border-color: #f472b6;
+}
+
+.dark-mode .file-card-enhanced div[style*="font-weight: 700"] {
+    color: #f472b6 !important;
+}
+
+/* Summary panel animation */
+[id^="summary-"] {
+    animation: slideDown 0.3s ease-out;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Button group responsive */
+@media (max-width: 600px) {
+    .file-card-enhanced > div:first-child {
+        flex-direction: column;
+    }
+    
+    .file-card-enhanced .pill-btn {
+        font-size: 0.7rem !important;
+        padding: 0.25rem 0.6rem !important;
+    }
+}
+
+/* Modal body scrollbar */
+#langModalBody {
+    scrollbar-width: thin;
+}
+
+#langModalBody::-webkit-scrollbar {
+    width: 8px;
+}
+
+#langModalBody::-webkit-scrollbar-track {
+    background: #ffe2f0;
+    border-radius: 10px;
+}
+
+#langModalBody::-webkit-scrollbar-thumb {
+    background: #f472b6;
+    border-radius: 10px;
+}
+
+.dark-mode #langModalBody::-webkit-scrollbar-track {
+    background: #2d2d44;
+}
+
+.dark-mode #langModalBody::-webkit-scrollbar-thumb {
+    background: #c084fc;
+}
