@@ -26,12 +26,17 @@ class StudyBuddy {
         this.updateStats(); 
         
         // Load dark mode preference
-        if (localStorage.getItem('darkMode') === 'true') {
+        const savedDarkMode = localStorage.getItem('darkMode');
+        if (savedDarkMode === 'true') {
             document.body.classList.add('dark-mode');
             const btn = document.getElementById('darkModeBtn');
             if (btn) btn.innerHTML = '<i class="fas fa-sun"></i> Light Mode';
-        }
-        
+        } else {
+            // Ensure light mode is default
+            document.body.classList.remove('dark-mode');
+            const btn = document.getElementById('darkModeBtn');
+            if (btn) btn.innerHTML = '<i class="fas fa-moon"></i> Dark Mode';
+        }        
         // Setup file search
         this.setupFileSearch();
         
@@ -1008,18 +1013,177 @@ class StudyBuddy {
     
     // ==================== TIMER METHODS ====================
     
+    // ==================== TIMER METHODS ====================
+    
     setupTimer() {
         const display = document.getElementById('timerDisplay');
         if (display) {
             this.updateTimerDisplay();
         }
         
+        // Timer control buttons
         document.getElementById('timerStartBtn').onclick = () => this.startTimer();
         document.getElementById('timerPauseBtn').onclick = () => this.pauseTimer();
         document.getElementById('timerResetBtn').onclick = () => this.resetTimer();
+        
+        // Preset buttons
         document.getElementById('setPomodoroBtn').onclick = () => this.setTimer(25 * 60);
         document.getElementById('setShortBreakBtn').onclick = () => this.setTimer(5 * 60);
         document.getElementById('setLongBreakBtn').onclick = () => this.setTimer(15 * 60);
+        
+        // Custom time button
+        document.getElementById('setCustomTimeBtn').onclick = () => this.setCustomTime();
+        
+        // Quick select buttons
+        document.querySelectorAll('.quick-time').forEach(btn => {
+            btn.onclick = () => {
+                const minutes = parseInt(btn.dataset.minutes);
+                if (!isNaN(minutes)) {
+                    this.setTimer(minutes * 60);
+                    this.showToast(`⏰ Timer set to ${minutes} minute${minutes !== 1 ? 's' : ''}`);
+                }
+            };
+        });
+        
+        // Add enter key support for custom time inputs
+        const customMinutes = document.getElementById('customMinutes');
+        const customSeconds = document.getElementById('customSeconds');
+        if (customMinutes) {
+            customMinutes.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') this.setCustomTime();
+            });
+        }
+        if (customSeconds) {
+            customSeconds.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') this.setCustomTime();
+            });
+        }
+    }
+
+    setCustomTime() {
+        const minutesInput = document.getElementById('customMinutes');
+        const secondsInput = document.getElementById('customSeconds');
+        
+        let minutes = parseInt(minutesInput.value) || 0;
+        let seconds = parseInt(secondsInput.value) || 0;
+        
+        // Validate inputs
+        minutes = Math.max(0, Math.min(180, minutes)); // Max 3 hours
+        seconds = Math.max(0, Math.min(59, seconds));
+        
+        const totalSeconds = (minutes * 60) + seconds;
+        
+        if (totalSeconds === 0) {
+            this.showToast('Please enter a valid time (at least 1 second)');
+            return;
+        }
+        
+        this.setTimer(totalSeconds);
+        
+        // Update display to show what was set
+        const mins = Math.floor(totalSeconds / 60);
+        const secs = totalSeconds % 60;
+        this.showToast(`⏰ Timer set to ${mins} min${mins !== 1 ? 's' : ''}${secs > 0 ? ` ${secs} sec` : ''}`);
+    }
+
+    updateTimerDisplay() {
+        const display = document.getElementById('timerDisplay');
+        if (display) {
+            const minutes = Math.floor(this.timerSeconds / 60);
+            const seconds = this.timerSeconds % 60;
+            display.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            
+            // Update the custom time inputs to match current timer (if not running)
+            if (!this.timerRunning) {
+                const customMinutes = document.getElementById('customMinutes');
+                const customSeconds = document.getElementById('customSeconds');
+                if (customMinutes && customSeconds) {
+                    customMinutes.value = minutes;
+                    customSeconds.value = seconds;
+                }
+            }
+        }
+    }
+
+    startTimer() {
+        if (this.timerRunning) return;
+        
+        // Add visual feedback
+        const startBtn = document.getElementById('timerStartBtn');
+        if (startBtn) {
+            startBtn.style.transform = 'scale(0.95)';
+            setTimeout(() => { startBtn.style.transform = ''; }, 200);
+        }
+        
+        this.timerRunning = true;
+        this.timerInterval = setInterval(() => {
+            if (this.timerSeconds > 0) {
+                this.timerSeconds--;
+                this.updateTimerDisplay();
+                
+                // Optional: Update document title with remaining time
+                const minutes = Math.floor(this.timerSeconds / 60);
+                const seconds = this.timerSeconds % 60;
+                document.title = `(${minutes}:${seconds.toString().padStart(2, '0')}) StudyBuddy`;
+            } else {
+                this.pauseTimer();
+                this.timerComplete();
+            }
+        }, 1000);
+    }
+
+    timerComplete() {
+        // Reset document title
+        document.title = 'StudyBuddy · Cute Study Organizer';
+        
+        // Show notification
+        this.showToast('⏰ Time is up! Great job focusing! 🎉');
+        
+        // Try to play sound (optional - won't error if fails)
+        try {
+            const audio = new Audio('https://www.soundjay.com/misc/sounds/bell-ringing-05.mp3');
+            audio.play().catch(e => console.log('Audio not supported'));
+        } catch(e) {}
+        
+        // Flash the modal or add visual effect
+        const modal = document.getElementById('timerModal');
+        if (modal) {
+            modal.style.animation = 'none';
+            modal.offsetHeight; // Trigger reflow
+            modal.style.animation = null;
+        }
+    }
+
+    pauseTimer() {
+        this.timerRunning = false;
+        if (this.timerInterval) {
+            clearInterval(this.timerInterval);
+            this.timerInterval = null;
+        }
+        // Reset document title
+        document.title = 'StudyBuddy · Cute Study Organizer';
+    }
+
+    resetTimer() {
+        this.pauseTimer();
+        this.timerSeconds = 25 * 60;
+        this.updateTimerDisplay();
+        this.showToast('Timer reset to 25:00');
+    }
+
+    setTimer(seconds) {
+        this.pauseTimer();
+        this.timerSeconds = seconds;
+        this.updateTimerDisplay();
+        
+        // Show what was set
+        const minutes = Math.floor(seconds / 60);
+        const remainingSeconds = seconds % 60;
+        if (remainingSeconds > 0) {
+            this.showToast(`⏰ Timer set to ${minutes}:${remainingSeconds.toString().padStart(2, '0')}`);
+        } else {
+            this.showToast(`⏰ Timer set to ${minutes} minute${minutes !== 1 ? 's' : ''}`);
+        }
     }
     
     updateTimerDisplay() {
@@ -1088,6 +1252,12 @@ class StudyBuddy {
         if (btn) {
             btn.innerHTML = isDark ? '<i class="fas fa-sun"></i> Light Mode' : '<i class="fas fa-moon"></i> Dark Mode';
         }
+        
+        // Force a re-render of current files to update their styles
+        if (this.selectedSubjectId) {
+            this.renderFiles();
+        }
+        
         this.showToast(isDark ? '🌙 Dark mode on' : '☀️ Light mode on');
     }
     
