@@ -161,3 +161,733 @@ body::after { content: "🍬"; font-size: 100px; position: fixed; top: 20px; rig
     padding: 1rem;
     margin-bottom: 1rem;
 }
+
+/* Dark Mode Styles - Complete Fix */
+.dark-mode {
+    background: linear-gradient(145deg, #1a1a2e 0%, #16213e 50%, #1a1a2e 100%);
+}
+
+.dark-mode .cute-card,
+.dark-mode .candy-header,
+.dark-mode .upload-zone-cute,
+.dark-mode .file-card,
+.dark-mode .summary-box,
+.dark-mode .notebook-container,
+.dark-mode .semester-notebook-area,
+.dark-mode .modal-card {
+    background: rgba(30, 30, 46, 0.95);
+    color: #e0e0e0;
+    border-color: #2d2d44;
+}
+
+.dark-mode .cute-input,
+.dark-mode .cute-select,
+.dark-mode .notebook-textarea {
+    background: #2d2d44;
+    color: #e0e0e0;
+    border-color: #3d3d5c;
+}
+
+.dark-mode .subject-bubble {
+    background: #2d2d44;
+    color: #e0e0e0;
+    border-color: #3d3d5c;
+}
+
+.dark-mode .subject-bubble.selected {
+    background: #3d2d4a;
+    border-left-color: #f472b6;
+}
+
+.dark-mode .summary-content,
+.dark-mode .file-meta {
+    color: #b0b0b0;
+}
+
+/* Fix all buttons in dark mode */
+.dark-mode .pill-btn {
+    background: #2d2d44;
+    border-color: #3d3d5c;
+    color: #f472b6;
+}
+
+.dark-mode .pill-btn:hover {
+    background: #3d3d5c;
+    transform: translateY(-3px);
+    color: #ec4899;
+}
+
+.dark-mode .btn-gradient {
+    background: linear-gradient(95deg, #db2777, #a855f7);
+    color: white;
+}
+
+.dark-mode .btn-gradient:hover {
+    background: linear-gradient(95deg, #ec4899, #c084fc);
+}
+
+.dark-mode .mini-btn {
+    background: #3d3d5c;
+    color: #e0e0e0;
+}
+
+.dark-mode .mini-btn.danger {
+    background: #5c2d2d;
+    color: #ff8888;
+}
+
+.dark-mode .mini-btn.edit {
+    background: #2d3d5c;
+    color: #88aaff;
+}
+
+.dark-mode .mini-btn:hover {
+    background: #4d4d6c;
+}
+
+.dark-mode .tab-btn {
+    color: #c084fc;
+}
+
+.dark-mode .tab-btn.active {
+    background: #2d2d44;
+    color: #f472b6;
+    border-bottom-color: #f472b6;
+}
+
+.dark-mode .badge-completion {
+    background: #3d2d4a;
+    color: #f472b6;
+}
+
+.dark-mode .stat-bubble {
+    background: linear-gradient(145deg, #2d2d44, #25253a);
+    border-color: #3d3d5c;
+}
+
+.dark-mode .stat-bubble span {
+    color: #f472b6;
+}
+
+.dark-mode .stat-bubble small {
+    color: #c084fc;
+}
+
+.dark-mode .search-input {
+    background: #2d2d44;
+    border-color: #3d3d5c;
+    color: #e0e0e0;
+}
+
+.dark-mode .search-input::placeholder {
+    color: #888;
+}
+
+.dark-mode .search-icon {
+    color: #c084fc;
+}
+
+.dark-mode .progress-container {
+    background: #2d2d44;
+}
+
+.dark-mode .progress-bar {
+    background: linear-gradient(90deg, #f472b6, #c084fc);
+}
+
+.dark-mode .progress-text {
+    color: #f472b6;
+}
+
+.dark-mode .notebook-title {
+    background: linear-gradient(135deg, #f472b6, #c084fc);
+    background-clip: text;
+    -webkit-background-clip: text;
+}
+
+.dark-mode .notebook-footer {
+    color: #c084fc;
+}
+
+.dark-mode .card-header-cute h2 {
+    color: #f472b6;
+}
+
+.dark-mode .card-header-cute {
+    border-bottom-color: #3d3d5c;
+}
+
+.dark-mode .subject-name-cute {
+    color: #f472b6;
+}
+
+.dark-mode .modal-header-cute {
+    background: #2d2d44;
+}
+
+.dark-mode .modal-header-cute h3 {
+    color: #f472b6;
+}
+
+.dark-mode .close-modal {
+    color: #f472b6;
+}
+
+.dark-mode .close-modal:hover {
+    color: #ec4899;
+}
+
+.dark-mode .timer-container {
+    background: linear-gradient(135deg, #db2777, #a855f7);
+}
+
+.dark-mode .timer-btn {
+    background: rgba(0,0,0,0.3);
+}
+
+.dark-mode .timer-btn:hover {
+    background: rgba(0,0,0,0.5);
+}
+
+.dark-mode .shortcuts-hint {
+    background: rgba(0,0,0,0.8);
+    color: #f472b6;
+}
+
+.dark-mode .shortcuts-hint:hover {
+    background: black;
+}
+
+.dark-mode .add-subject-area .cute-input {
+    background: #2d2d44;
+    color: #e0e0e0;
+}
+
+.dark-mode .add-subject-area .cute-input::placeholder {
+    color: #888;
+}
+
+.dark-mode #selectedSubjectInfo div {
+    background: #2d2d44 !important;
+    color: #e0e0e0 !important;
+}
+
+.dark-mode .file-card textarea {
+    background: #3d3d5c;
+    color: #e0e0e0;
+    border-color: #4d4d6c;
+}
+
+.dark-mode .file-card textarea::placeholder {
+    color: #888;
+}
+
+.dark-mode .summary-section {
+    background: #2d2d44;
+    border-bottom-color: #3d3d5c;
+}
+
+.dark-mode .summary-title {
+    color: #f472b6;
+}
+
+.dark-mode .summary-content {
+    color: #b0b0b0;
+}
+
+.dark-mode .footer {
+    background: #2d2d44;
+    color: #888;
+    border-top-color: #3d3d5c;
+}
+
+/* Study Timer */
+.timer-container {
+    background: linear-gradient(135deg, #f472b6, #c084fc);
+    border-radius: 20px;
+    padding: 15px;
+    margin-bottom: 15px;
+    text-align: center;
+    color: white;
+}
+.timer-display {
+    font-size: 48px;
+    font-weight: 800;
+    font-family: monospace;
+    letter-spacing: 5px;
+}
+.timer-controls {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    margin-top: 10px;
+}
+.timer-btn {
+    background: rgba(255,255,255,0.2);
+    border: none;
+    padding: 8px 20px;
+    border-radius: 30px;
+    color: white;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.2s;
+}
+.timer-btn:hover {
+    background: rgba(255,255,255,0.3);
+    transform: scale(1.05);
+}
+
+/* Keyboard Shortcuts Hint */
+.shortcuts-hint {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background: rgba(0,0,0,0.7);
+    color: white;
+    padding: 5px 10px;
+    border-radius: 20px;
+    font-size: 11px;
+    z-index: 1000;
+    cursor: help;
+}
+.shortcuts-hint:hover {
+    background: black;
+}
+
+/* File search highlight */
+.file-match-highlight {
+    background: #fce7f3;
+    border-left: 4px solid #f472b6;
+    transition: all 0.2s;
+}
+
+.dark-mode .file-match-highlight {
+    background: #3d2d4a;
+    border-left-color: #f472b6;
+}
+
+.search-highlight {
+    background: #fbbf24;
+    color: #1a1a2e;
+    padding: 0 2px;
+    border-radius: 4px;
+    font-weight: bold;
+}
+
+.dark-mode .search-highlight {
+    background: #f59e0b;
+    color: #1a1a2e;
+}
+
+.file-search-stats {
+    font-size: 12px;
+    color: #c084fc;
+    margin-top: 5px;
+    text-align: center;
+}
+
+.file-search-clear {
+    position: absolute;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    color: #c084fc;
+    font-size: 14px;
+    display: none;
+}
+
+.file-search-clear:hover {
+    color: #ec4899;
+}
+
+/* Add at the end of styles.css */
+
+/* Performance Optimizations */
+* {
+    -webkit-tap-highlight-color: transparent;
+}
+
+/* Smooth scrolling */
+html {
+    scroll-behavior: smooth;
+}
+
+/* Optimize animations */
+.cute-card,
+.pill-btn,
+.btn-gradient,
+.subject-bubble {
+    will-change: transform;
+}
+
+/* Mobile optimizations */
+@media (max-width: 768px) {
+    body {
+        padding: 1rem;
+    }
+    
+    .candy-header {
+        padding: 0.8rem 1rem;
+        margin-bottom: 1rem;
+    }
+    
+    .logo-icon {
+        width: 40px;
+        height: 40px;
+        font-size: 1.5rem;
+    }
+    
+    .logo-text h1 {
+        font-size: 1.3rem;
+    }
+    
+    .logo-text p {
+        font-size: 0.65rem;
+    }
+    
+    .stat-bubble {
+        padding: 0.2rem 0.8rem;
+    }
+    
+    .stat-bubble span {
+        font-size: 1.2rem;
+    }
+    
+    .stat-bubble small {
+        font-size: 0.6rem;
+    }
+    
+    .action-pills {
+        gap: 0.5rem;
+        margin-bottom: 1rem;
+    }
+    
+    .pill-btn {
+        padding: 0.4rem 0.8rem;
+        font-size: 0.75rem;
+        gap: 4px;
+    }
+    
+    .main-grid-cute {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+    
+    .cute-card {
+        padding: 1rem;
+        border-radius: 32px;
+    }
+    
+    .card-header-cute h2 {
+        font-size: 1.2rem;
+    }
+    
+    .card-header-cute {
+        margin-bottom: 1rem;
+    }
+    
+    .subject-bubble {
+        padding: 0.6rem;
+    }
+    
+    .subject-name-cute {
+        font-size: 0.85rem;
+    }
+    
+    .badge-completion {
+        font-size: 0.6rem;
+        padding: 0.15rem 0.5rem;
+    }
+    
+    .mini-btn {
+        padding: 0.15rem 0.5rem;
+        font-size: 0.6rem;
+    }
+    
+    .cute-input {
+        padding: 0.5rem 1rem;
+        font-size: 0.85rem;
+    }
+    
+    .upload-zone-cute {
+        padding: 0.8rem;
+    }
+    
+    .upload-zone-cute p {
+        font-size: 0.8rem;
+    }
+    
+    .file-card {
+        padding: 0.5rem;
+    }
+    
+    .file-card textarea {
+        font-size: 0.8rem;
+    }
+    
+    .summary-box {
+        font-size: 0.75rem;
+        max-height: 200px;
+    }
+    
+    .notebook-textarea {
+        min-height: 180px;
+        font-size: 0.85rem;
+        padding: 0.8rem;
+    }
+    
+    .modal-card {
+        width: 95%;
+        max-height: 90%;
+    }
+    
+    .timer-display {
+        font-size: 32px;
+    }
+    
+    .timer-btn {
+        padding: 5px 12px;
+        font-size: 12px;
+    }
+    
+    .shortcuts-hint {
+        display: none; /* Hide on mobile, takes too much space */
+    }
+    
+    .subjects-scroll {
+        max-height: 280px;
+    }
+    
+    .files-list-cute {
+        max-height: 220px;
+    }
+    
+    .search-input {
+        font-size: 14px; /* Prevents zoom on mobile */
+    }
+    
+    .file-search-stats {
+        font-size: 10px;
+    }
+}
+
+/* Performance Optimizations - Cleaned */
+* {
+    -webkit-tap-highlight-color: transparent;
+}
+
+/* Smooth scrolling */
+html {
+    scroll-behavior: smooth;
+}
+
+/* Mobile optimizations */
+@media (max-width: 768px) {
+    body {
+        padding: 1rem;
+    }
+    
+    .candy-header {
+        padding: 0.8rem 1rem;
+        margin-bottom: 1rem;
+    }
+    
+    .logo-icon {
+        width: 40px;
+        height: 40px;
+        font-size: 1.5rem;
+    }
+    
+    .logo-text h1 {
+        font-size: 1.3rem;
+    }
+    
+    .logo-text p {
+        font-size: 0.65rem;
+    }
+    
+    .stat-bubble {
+        padding: 0.2rem 0.8rem;
+    }
+    
+    .stat-bubble span {
+        font-size: 1.2rem;
+    }
+    
+    .stat-bubble small {
+        font-size: 0.6rem;
+    }
+    
+    .action-pills {
+        gap: 0.5rem;
+        margin-bottom: 1rem;
+    }
+    
+    .pill-btn {
+        padding: 0.4rem 0.8rem;
+        font-size: 0.75rem;
+        gap: 4px;
+    }
+    
+    .main-grid-cute {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+    
+    .cute-card {
+        padding: 1rem;
+        border-radius: 32px;
+    }
+    
+    .card-header-cute h2 {
+        font-size: 1.2rem;
+    }
+    
+    .card-header-cute {
+        margin-bottom: 1rem;
+    }
+    
+    .subject-bubble {
+        padding: 0.6rem;
+    }
+    
+    .subject-name-cute {
+        font-size: 0.85rem;
+    }
+    
+    .badge-completion {
+        font-size: 0.6rem;
+        padding: 0.15rem 0.5rem;
+    }
+    
+    .mini-btn {
+        padding: 0.15rem 0.5rem;
+        font-size: 0.6rem;
+    }
+    
+    .cute-input {
+        padding: 0.5rem 1rem;
+        font-size: 0.85rem;
+    }
+    
+    .upload-zone-cute {
+        padding: 0.8rem;
+    }
+    
+    .upload-zone-cute p {
+        font-size: 0.8rem;
+    }
+    
+    .file-card {
+        padding: 0.5rem;
+    }
+    
+    .file-card textarea {
+        font-size: 0.8rem;
+    }
+    
+    .summary-box {
+        font-size: 0.75rem;
+        max-height: 200px;
+    }
+    
+    .notebook-textarea {
+        min-height: 180px;
+        font-size: 0.85rem;
+        padding: 0.8rem;
+    }
+    
+    .modal-card {
+        width: 95%;
+        max-height: 90%;
+    }
+    
+    .timer-display {
+        font-size: 32px;
+    }
+    
+    .timer-btn {
+        padding: 5px 12px;
+        font-size: 12px;
+    }
+    
+    .shortcuts-hint {
+        display: none;
+    }
+    
+    .subjects-scroll {
+        max-height: 280px;
+    }
+    
+    .files-list-cute {
+        max-height: 220px;
+    }
+    
+    .search-input {
+        font-size: 14px;
+    }
+    
+    .file-search-stats {
+        font-size: 10px;
+    }
+    
+    /* Better touch targets */
+    .pill-btn,
+    .mini-btn,
+    .btn-gradient,
+    .tab-btn,
+    .timer-btn {
+        min-height: 44px;
+    }
+    
+    .file-summary-input {
+        min-height: 44px;
+    }
+}
+
+/* Tablet optimization */
+@media (min-width: 769px) and (max-width: 1024px) {
+    .main-grid-cute {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1.2rem;
+    }
+    
+    .cute-card {
+        padding: 1.2rem;
+    }
+    
+    body {
+        padding: 1.5rem;
+    }
+}
+
+/* Reduced motion preference */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+    }
+}
+
+/* Smooth scrolling for lists */
+.subjects-scroll,
+.files-list-cute {
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: thin;
+}
+
+/* Force textarea to show plain text */
+.file-summary-input {
+    white-space: pre-wrap;
+    word-wrap: break-word;
+}
+
+/* Make sure highlighted text doesn't get saved as HTML */
+.file-summary-input:focus {
+    outline: none;
+}
