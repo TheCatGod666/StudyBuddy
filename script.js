@@ -10,6 +10,23 @@ class StudyBuddy {
         this.init(); 
     }
     
+    async debugFileInSubject(fileId) {
+        const subject = this.getSubject(this.selectedSubjectId);
+        if (!subject) {
+            console.log('No subject selected');
+            return;
+        }
+        
+        const file = subject.files.find(f => f.id === fileId);
+        if (file) {
+            console.log('File found in subject:', file);
+            const fileData = await this.getFileFromDB(fileId);
+            console.log('File data from DB:', fileData ? 'Has data' : 'No data');
+        } else {
+            console.log('File NOT found in subject. Available files:', subject.files.map(f => ({ id: f.id, name: f.name })));
+        }
+    }
+
     async init() { 
         await this.initDB(); 
         this.attachEventListeners(); 
@@ -25,24 +42,18 @@ class StudyBuddy {
         } 
         this.updateStats(); 
         
-        // Load dark mode preference
         const savedDarkMode = localStorage.getItem('darkMode');
         if (savedDarkMode === 'true') {
             document.body.classList.add('dark-mode');
             const btn = document.getElementById('darkModeBtn');
             if (btn) btn.innerHTML = '<i class="fas fa-sun"></i> Light Mode';
         } else {
-            // Ensure light mode is default
             document.body.classList.remove('dark-mode');
             const btn = document.getElementById('darkModeBtn');
             if (btn) btn.innerHTML = '<i class="fas fa-moon"></i> Dark Mode';
         }        
-        // Setup file search
         this.setupFileSearch();
-        
-        // Clean up any existing HTML in summaries
         await this.cleanupExistingSummaries();
-        
         this.showToast('🐻‍❄️ Ready! Click any file to view in new tab 💖');
     }
     
@@ -182,19 +193,15 @@ class StudyBuddy {
         this.db.transaction(['files'], 'readwrite').objectStore('files').delete(fileId); 
     }
     
-    // ==================== BACKUP & RESTORE (FIXED) ====================
+    // ==================== BACKUP & RESTORE ====================
     
     async exportToJSON() { 
         this.showToast('📦 Creating backup...');
-        
-        // Create a deep copy of the data
         const backup = { 
             version: "3.0", 
             exportDate: new Date().toISOString(), 
             data: JSON.parse(JSON.stringify(this.data))
         }; 
-        
-        // Embed file data
         let fileCount = 0;
         for (const semester of backup.data.semesters) {
             for (const subject of semester.subjects) {
@@ -205,18 +212,12 @@ class StudyBuddy {
                             if (fileData && fileData.data) {
                                 file.embeddedData = fileData.data;
                                 fileCount++;
-                            } else if (file.data) {
-                                file.embeddedData = file.data;
-                                fileCount++;
                             }
-                        } catch(e) {
-                            console.log('Could not backup file:', file.name);
-                        }
+                        } catch(e) {}
                     }
                 }
             }
         }
-        
         const jsonStr = JSON.stringify(backup, null, 2);
         const blob = new Blob([jsonStr], { type: 'application/json' }); 
         const a = document.createElement('a'); 
@@ -232,27 +233,17 @@ class StudyBuddy {
         reader.onload = async (e) => { 
             try { 
                 const imported = JSON.parse(e.target.result); 
-                
-                // Check for valid backup format
                 if (imported.data?.semesters) { 
                     if (confirm('⚠️ Replace current data? This will overwrite everything.')) { 
                         this.showToast('📀 Restoring...');
-                        
-                        // Clear existing files from IndexedDB
                         if (this.db) {
                             try {
                                 const transaction = this.db.transaction(['files'], 'readwrite');
                                 transaction.objectStore('files').clear();
                                 await new Promise((resolve) => { transaction.oncomplete = resolve; });
-                            } catch(err) {
-                                console.log('Could not clear files:', err);
-                            }
+                            } catch(err) {}
                         }
-                        
-                        // Replace the data
                         this.data = imported.data;
-                        
-                        // Restore embedded files
                         let restoredCount = 0;
                         for (const semester of this.data.semesters) {
                             for (const subject of semester.subjects) {
@@ -272,18 +263,13 @@ class StudyBuddy {
                                                     uploadedAt: file.uploadedAt || new Date().toISOString()
                                                 };
                                                 await this.saveFileToDB(dbFile, subject.id);
-                                                file.data = fileData;
-                                                delete file.embeddedData;
                                                 restoredCount++;
-                                            } catch(e) {
-                                                console.log('Could not restore file:', file.name, e);
-                                            }
+                                            } catch(e) {}
                                         }
                                     }
                                 }
                             }
                         }
-                        
                         await this.saveDataToDB(); 
                         this.currentSemesterId = this.data.semesters[0]?.id || null; 
                         this.selectedSubjectId = null; 
@@ -293,28 +279,6 @@ class StudyBuddy {
                         document.getElementById('subjectFilesArea').style.display = 'none'; 
                         this.showToast(`🎉 Restored ${restoredCount} files!`); 
                     } 
-                } else if (imported.semesters) {
-                    // Legacy format support
-                    if (confirm('⚠️ Replace current data? This will overwrite everything.')) { 
-                        this.showToast('📀 Restoring legacy backup...');
-                        
-                        if (this.db) {
-                            try {
-                                const transaction = this.db.transaction(['files'], 'readwrite');
-                                transaction.objectStore('files').clear();
-                                await new Promise((resolve) => { transaction.oncomplete = resolve; });
-                            } catch(err) {}
-                        }
-                        
-                        this.data = { semesters: imported.semesters, version: "3.0" };
-                        await this.saveDataToDB(); 
-                        this.currentSemesterId = this.data.semesters[0]?.id || null; 
-                        this.selectedSubjectId = null; 
-                        this.renderSemesterSelector(); 
-                        this.renderSubjects(); 
-                        this.loadSemesterNotebook(); 
-                        this.showToast(`🎉 Legacy backup restored!`); 
-                    }
                 } else { 
                     this.showToast('❌ Invalid backup file format'); 
                 } 
@@ -361,7 +325,6 @@ class StudyBuddy {
     renderSemesterSelector() {
         const selector = document.getElementById('semesterSelector');
         if (!selector) return;
-        
         selector.innerHTML = this.data.semesters.map(s => 
             `<option value="${s.id}" ${this.currentSemesterId === s.id ? 'selected' : ''}>📚 ${this.escape(s.name)}</option>`
         ).join('');
@@ -390,17 +353,14 @@ class StudyBuddy {
             </div>
         `).join('');
         
-        // Attach click handlers for subjects
         document.querySelectorAll('.subject-bubble').forEach(el => {
             el.addEventListener('click', (e) => {
-                // Don't trigger if clicking on buttons
                 if (e.target.classList.contains('mini-btn')) return;
                 const subjectId = parseInt(el.dataset.subjectId);
                 this.selectSubject(subjectId);
             });
         });
         
-        // Attach edit/delete handlers
         document.querySelectorAll('.mini-btn.edit').forEach(btn => {
             btn.addEventListener('click', (e) => {
                 e.stopPropagation();
@@ -445,55 +405,47 @@ class StudyBuddy {
     
     attachFileEventListeners() {
         const container = document.getElementById('filesList');
-            if (!container) return;
-            const sub = this.getSubject(this.selectedSubjectId);
-            if (!sub) return;
-            
-            // Save button
-            for (let btn of container.querySelectorAll('.save-summary-btn')) {
-                btn.removeEventListener('click', btn._listener);
-                // In attachFileEventListeners method, update the save button listener:
-    const listener = async (e) => {
-        const idx = parseInt(btn.dataset.idx);
-        const ta = container.querySelector(`.file-summary-input[data-idx="${idx}"]`);
-        if (ta && sub.files[idx]) {
-            // CRITICAL: Strip all HTML tags before saving
-            let plainText = ta.value.replace(/<[^>]*>/g, '').trim();
-            
-            console.log("Saving cleaned:", plainText);
-            
-            sub.files[idx].summaryNotes = plainText;
-            const fileData = await this.getFileFromDB(sub.files[idx].id);
-            if (fileData) {
-                fileData.summaryNotes = plainText;
-                this.db?.transaction(['files'], 'readwrite').objectStore('files').put(fileData);
-            }
-            await this.saveDataToDB();
-            this.showToast('file summary saved!');
-            
-            // Refresh view to show saved content
-            this.renderFiles();
-        }
-    };
-            btn.addEventListener('click', listener);
-            btn._listener = listener;
-        }
+        if (!container) return;
         
-        // View button
-        for (let btn of container.querySelectorAll('.view-file-btn')) {
-            btn.removeEventListener('click', btn._viewListener);
-            const listener = async () => {
+        const sub = this.getSubject(this.selectedSubjectId);
+        if (!sub) return;
+        
+        // Save summary buttons
+        container.querySelectorAll('.save-summary-btn').forEach(btn => {
+            btn.onclick = async (e) => {
+                e.stopPropagation();
                 const idx = parseInt(btn.dataset.idx);
-                if (sub.files[idx]) await this.openFileInNewTab(sub.files[idx]);
+                const ta = container.querySelector(`.file-summary-input[data-idx="${idx}"]`);
+                if (ta && sub.files[idx]) {
+                    let plainText = ta.value.replace(/<[^>]*>/g, '').trim();
+                    sub.files[idx].summaryNotes = plainText;
+                    const fileData = await this.getFileFromDB(sub.files[idx].id);
+                    if (fileData) {
+                        fileData.summaryNotes = plainText;
+                        this.db?.transaction(['files'], 'readwrite').objectStore('files').put(fileData);
+                    }
+                    await this.saveDataToDB();
+                    this.showToast('file summary saved!');
+                    this.renderFiles();
+                }
             };
-            btn.addEventListener('click', listener);
-            btn._viewListener = listener;
-        }
+        });
         
-        // Delete button
-        for (let btn of container.querySelectorAll('.delete-file-btn')) {
-            btn.removeEventListener('click', btn._deleteListener);
-            const listener = async () => {
+        // View file buttons
+        container.querySelectorAll('.view-file-btn').forEach(btn => {
+            btn.onclick = async (e) => {
+                e.stopPropagation();
+                const idx = parseInt(btn.dataset.idx);
+                if (sub.files[idx]) {
+                    await this.openFileFromAnywhere(sub.files[idx]);
+                }
+            };
+        });
+        
+        // Delete file buttons
+        container.querySelectorAll('.delete-file-btn').forEach(btn => {
+            btn.onclick = async (e) => {
+                e.stopPropagation();
                 if (confirm('Delete this file? 🗑️')) {
                     const idx = parseInt(btn.dataset.idx);
                     const fileId = sub.files[idx].id;
@@ -504,9 +456,7 @@ class StudyBuddy {
                     this.showToast('file removed');
                 }
             };
-            btn.addEventListener('click', listener);
-            btn._deleteListener = listener;
-        }
+        });
     }
     
     // ==================== SUBJECT METHODS ====================
@@ -653,7 +603,6 @@ class StudyBuddy {
         }
         const semester = this.getCurrentSemester();
         if (confirm(`Delete semester "${semester?.name}" and everything inside?`)) {
-            // Delete all files in this semester
             for (const subject of semester.subjects) {
                 for (const file of subject.files) {
                     await this.deleteFileFromDB(file.id);
@@ -726,28 +675,101 @@ class StudyBuddy {
         }
     }
     
-    async openFileInNewTab(file) {
-        const fileData = await this.getFileFromDB(file.id);
-        if (fileData && fileData.data) {
-            const blob = this.dataURLToBlob(fileData.data);
-            const url = URL.createObjectURL(blob);
-            window.open(url, '_blank');
-            setTimeout(() => URL.revokeObjectURL(url), 1000);
-        } else {
-            this.showToast('Could not open file');
+    async openFileFromAnywhere(file) {
+        try {
+            console.log('openFileFromAnywhere called with:', file);
+            this.showToast(`📂 Opening ${file.name}...`);
+            
+            // Get the actual file data from IndexedDB
+            const fileData = await this.getFileFromDB(file.id);
+            console.log('File data from DB:', fileData ? 'Found' : 'Not found', fileData?.data ? 'Has data' : 'No data');
+            
+            if (fileData && fileData.data) {
+                // Convert base64 to blob
+                const blob = this.dataURLToBlob(fileData.data);
+                const url = URL.createObjectURL(blob);
+                
+                // Open in new tab
+                const newTab = window.open(url, '_blank');
+                if (!newTab) {
+                    this.showToast('⚠️ Pop-up blocked! Please allow pop-ups for this site.');
+                } else {
+                    this.showToast(`✅ Opened: ${file.name}`);
+                }
+                
+                // Clean up after a delay
+                setTimeout(() => URL.revokeObjectURL(url), 5000);
+            } else {
+                console.error('File data missing for:', file.id, file.name);
+                this.showToast('❌ File data not found - file may be corrupted');
+            }
+        } catch (error) {
+            console.error('Open error:', error);
+            this.showToast('❌ Failed to open file: ' + error.message);
         }
     }
-    
-    dataURLToBlob(dataURL) {
-        const arr = dataURL.split(',');
-        const mime = arr[0].match(/:(.*?);/)[1];
-        const bstr = atob(arr[1]);
-        let n = bstr.length;
-        const u8arr = new Uint8Array(n);
-        while (n--) {
-            u8arr[n] = bstr.charCodeAt(n);
+
+    async downloadFileFromAnywhere(file) {
+        try {
+            console.log('downloadFileFromAnywhere called with:', file);
+            this.showToast(`📥 Downloading ${file.name}...`);
+            
+            // Get the actual file data from IndexedDB
+            const fileData = await this.getFileFromDB(file.id);
+            console.log('File data from DB:', fileData ? 'Found' : 'Not found', fileData?.data ? 'Has data' : 'No data');
+            
+            if (fileData && fileData.data) {
+                // Convert base64 to blob
+                const blob = this.dataURLToBlob(fileData.data);
+                
+                // Create download link
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = file.name;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                
+                // Clean up
+                setTimeout(() => URL.revokeObjectURL(url), 100);
+                this.showToast(`✅ Downloaded: ${file.name}`);
+            } else {
+                console.error('File data missing for:', file.id, file.name);
+                this.showToast('❌ File data not found - file may be corrupted');
+            }
+        } catch (error) {
+            console.error('Download error:', error);
+            this.showToast('❌ Download failed: ' + error.message);
         }
-        return new Blob([u8arr], { type: mime });
+    }
+        
+    dataURLToBlob(dataURL) {
+        try {
+            if (!dataURL) {
+                console.error('No dataURL provided');
+                return new Blob([], { type: 'application/octet-stream' });
+            }
+            
+            const arr = dataURL.split(',');
+            if (arr.length < 2) {
+                console.error('Invalid dataURL format');
+                return new Blob([dataURL], { type: 'application/octet-stream' });
+            }
+            
+            const mimeMatch = arr[0].match(/:(.*?);/);
+            const mime = mimeMatch ? mimeMatch[1] : 'application/octet-stream';
+            const bstr = atob(arr[1]);
+            let n = bstr.length;
+            const u8arr = new Uint8Array(n);
+            while (n--) {
+                u8arr[n] = bstr.charCodeAt(n);
+            }
+            return new Blob([u8arr], { type: mime });
+        } catch (error) {
+            console.error('Blob conversion error:', error);
+            return new Blob([dataURL], { type: 'application/octet-stream' });
+        }
     }
     
     // ==================== SUMMARY METHODS ====================
@@ -759,7 +781,6 @@ class StudyBuddy {
         let summary = `🌸 SEMESTER SUMMARY: ${semester.name} 🌸\n`;
         summary += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n`;
         
-        // Semester notebook
         if (semester.semesterNotebook && semester.semesterNotebook.trim()) {
             summary += `📓 SEMESTER NOTEBOOK:\n${semester.semesterNotebook}\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n`;
         }
@@ -798,7 +819,6 @@ class StudyBuddy {
     exportSummary() {
         const summaryDiv = document.getElementById('semesterSummary');
         if (!summaryDiv) return;
-        
         const text = summaryDiv.innerText || summaryDiv.textContent;
         const blob = new Blob([text], { type: 'text/plain' });
         const a = document.createElement('a');
@@ -818,23 +838,179 @@ class StudyBuddy {
             return;
         }
         
+        // Store the actual file objects for direct access
+        this.modalFiles = [];
         const filesByLang = {};
+        
         for (const file of subject.files) {
             const lang = this.detectLanguage(file.name);
             if (!filesByLang[lang]) filesByLang[lang] = [];
             filesByLang[lang].push(file);
+            this.modalFiles.push(file); // Store reference to actual file objects
         }
         
         const modalBody = document.getElementById('langModalBody');
         modalBody.innerHTML = Object.entries(filesByLang).map(([lang, files]) => `
-            <div style="margin-bottom:1.5rem;">
-                <h4 style="color:#db2777;">📁 ${lang} (${files.length})</h4>
-                ${files.map(f => `<div style="margin-left:1rem; padding:0.3rem;">📄 ${this.escape(f.name)} <small>${this.formatSize(f.size)}</small></div>`).join('')}
+            <div style="margin-bottom: 2rem; border-bottom: 2px solid #ffe2f0; padding-bottom: 1rem;">
+                <h4 style="color: #db2777; margin-bottom: 1rem; display: flex; align-items: center; gap: 10px;">
+                    <i class="fas fa-folder-open"></i> ${lang} 
+                    <span style="font-size: 0.8rem; background: #fce7f3; padding: 0.2rem 0.6rem; border-radius: 20px;">${files.length} files</span>
+                </h4>
+                <div style="display: flex; flex-direction: column; gap: 0.8rem;">
+                    ${files.map(f => `
+                        <div class="file-card-enhanced" data-file-id="${f.id}" style="background: #ffffffc9; border-radius: 20px; padding: 0.8rem; transition: all 0.2s;">
+                            <div style="display: flex; justify-content: space-between; align-items: start; flex-wrap: wrap; gap: 0.5rem;">
+                                <div style="flex: 1;">
+                                    <div style="font-weight: 700; color: #831843; margin-bottom: 0.3rem;">
+                                        <i class="fas fa-file"></i> ${this.escape(f.name)}
+                                    </div>
+                                    <div style="font-size: 0.7rem; color: #a855a7;">
+                                        <i class="far fa-clock"></i> ${new Date(f.uploadedAt).toLocaleDateString()} • 
+                                        <i class="fas fa-database"></i> ${this.formatSize(f.size)}
+                                    </div>
+                                </div>
+                                <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                                    <button class="pill-btn view-file-lang-btn" data-file-index="${this.modalFiles.indexOf(f)}" style="background: #a5f3fc; padding: 0.3rem 0.8rem;">
+                                        <i class="fas fa-external-link-alt"></i> Open
+                                    </button>
+                                    <button class="pill-btn download-file-lang-btn" data-file-index="${this.modalFiles.indexOf(f)}" style="background: #c084fc; padding: 0.3rem 0.8rem;">
+                                        <i class="fas fa-download"></i> Download
+                                    </button>
+                                    <button class="pill-btn summary-file-lang-btn" data-file-id="${f.id}" style="background: #fbbf24; padding: 0.3rem 0.8rem;">
+                                        <i class="fas fa-sticky-note"></i> Summary
+                                    </button>
+                                </div>
+                            </div>
+                            <div id="summary-${f.id}" style="display: none; margin-top: 0.8rem; padding-top: 0.8rem; border-top: 1px solid #ffe2f0;">
+                                <textarea id="summary-text-${f.id}" class="cute-input" rows="2" placeholder="Add your notes about this file..." style="width: 100%; font-size: 0.85rem;">${this.escape(f.summaryNotes || '')}</textarea>
+                                <div style="display: flex; gap: 0.5rem; margin-top: 0.5rem;">
+                                    <button class="pill-btn save-summary-lang-btn" data-file-id="${f.id}" style="background: #10b981; padding: 0.3rem 0.8rem;">
+                                        <i class="fas fa-save"></i> Save Summary
+                                    </button>
+                                    <button class="pill-btn close-summary-lang-btn" data-file-id="${f.id}" style="background: #ef4444; padding: 0.3rem 0.8rem;">
+                                        <i class="fas fa-times"></i> Close
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
             </div>
         `).join('');
         
+        this.attachLanguageModalListeners();
         document.getElementById('filesByLanguageModal').style.display = 'flex';
     }
+
+    attachLanguageModalListeners() {
+        // View/Open buttons - use stored file references
+        document.querySelectorAll('.view-file-lang-btn').forEach(btn => {
+            btn.onclick = async (e) => {
+                e.stopPropagation();
+                const fileIndex = parseInt(btn.dataset.fileIndex);
+                const file = this.modalFiles[fileIndex];
+                
+                if (file) {
+                    console.log('Opening file:', file.name);
+                    await this.openFileFromAnywhere(file);
+                } else {
+                    console.error('File not found at index:', fileIndex);
+                    this.showToast('❌ File not found');
+                }
+            };
+        });
+        
+        // Download buttons - use stored file references
+        document.querySelectorAll('.download-file-lang-btn').forEach(btn => {
+            btn.onclick = async (e) => {
+                e.stopPropagation();
+                const fileIndex = parseInt(btn.dataset.fileIndex);
+                const file = this.modalFiles[fileIndex];
+                
+                if (file) {
+                    console.log('Downloading file:', file.name);
+                    await this.downloadFileFromAnywhere(file);
+                } else {
+                    console.error('File not found at index:', fileIndex);
+                    this.showToast('❌ File not found');
+                }
+            };
+        });
+        
+        // Summary buttons (show summary panel)
+        document.querySelectorAll('.summary-file-lang-btn').forEach(btn => {
+            btn.onclick = (e) => {
+                e.stopPropagation();
+                const fileId = btn.dataset.fileId;
+                const summaryDiv = document.getElementById(`summary-${fileId}`);
+                if (summaryDiv) {
+                    document.querySelectorAll('[id^="summary-"]').forEach(div => {
+                        if (div.id !== `summary-${fileId}`) {
+                            div.style.display = 'none';
+                        }
+                    });
+                    summaryDiv.style.display = summaryDiv.style.display === 'none' ? 'block' : 'none';
+                }
+            };
+        });
+        
+        // Save summary buttons
+        document.querySelectorAll('.save-summary-lang-btn').forEach(btn => {
+            btn.onclick = async (e) => {
+                e.stopPropagation();
+                const fileId = parseInt(btn.dataset.fileId);
+                const textarea = document.getElementById(`summary-text-${fileId}`);
+                
+                if (textarea) {
+                    // Find the file in modalFiles
+                    const file = this.modalFiles.find(f => f.id === fileId);
+                    
+                    if (file) {
+                        let plainText = textarea.value.replace(/<[^>]*>/g, '').trim();
+                        file.summaryNotes = plainText;
+                        
+                        // Also update in the actual subject
+                        const subject = this.getSubject(this.selectedSubjectId);
+                        const actualFile = subject?.files.find(f => f.id === fileId);
+                        if (actualFile) {
+                            actualFile.summaryNotes = plainText;
+                        }
+                        
+                        // Save to IndexedDB
+                        const fileData = await this.getFileFromDB(fileId);
+                        if (fileData) {
+                            fileData.summaryNotes = plainText;
+                            const transaction = this.db?.transaction(['files'], 'readwrite');
+                            if (transaction) {
+                                transaction.objectStore('files').put(fileData);
+                            }
+                        }
+                        
+                        await this.saveDataToDB();
+                        this.showToast('💾 Summary saved!');
+                        
+                        if (this.selectedSubjectId) {
+                            this.renderFiles();
+                        }
+                        
+                        const summaryDiv = document.getElementById(`summary-${fileId}`);
+                        if (summaryDiv) summaryDiv.style.display = 'none';
+                    }
+                }
+            };
+        });
+        
+        // Close summary buttons
+        document.querySelectorAll('.close-summary-lang-btn').forEach(btn => {
+            btn.onclick = (e) => {
+                e.stopPropagation();
+                const fileId = btn.dataset.fileId;
+                const summaryDiv = document.getElementById(`summary-${fileId}`);
+                if (summaryDiv) summaryDiv.style.display = 'none';
+            };
+        });
+    }
+        
     
     async viewNotebookSummary() {
         const semester = this.getCurrentSemester();
@@ -875,7 +1051,6 @@ class StudyBuddy {
     setupSearch() {
         const searchInput = document.getElementById('searchInput');
         if (!searchInput) return;
-        
         searchInput.addEventListener('input', this.debounce(() => {
             this.performGlobalSearch(searchInput.value);
         }, 300));
@@ -943,7 +1118,6 @@ class StudyBuddy {
     setupFileSearch() {
         const fileSearchInput = document.getElementById('fileSearchInput');
         if (!fileSearchInput) return;
-        
         fileSearchInput.addEventListener('input', this.debounce(() => {
             this.performFileSearch(fileSearchInput.value);
         }, 300));
@@ -977,20 +1151,13 @@ class StudyBuddy {
             return;
         }
         
-        // Render with temporary highlight spans (not saved)
         container.innerHTML = matchedFiles.map(({ file, idx, nameMatch, notesMatch }) => {
             let displayName = this.escape(file.name);
-            // CRITICAL FIX: Use the original plain text for the textarea value
             let displayNotes = file.summaryNotes ? this.escape(file.summaryNotes) : '';
-            let displayNotesWithHighlight = displayNotes;
             
             if (nameMatch) {
                 const regex = new RegExp(`(${this.escapeRegExp(term)})`, 'gi');
                 displayName = displayName.replace(regex, '<span class="search-highlight">$1</span>');
-            }
-            if (notesMatch && displayNotes) {
-                const regex = new RegExp(`(${this.escapeRegExp(term)})`, 'gi');
-                displayNotesWithHighlight = displayNotes.replace(regex, '<span class="search-highlight">$1</span>');
             }
             
             return `<div class="file-card file-match-highlight">
@@ -1013,77 +1180,33 @@ class StudyBuddy {
     
     // ==================== TIMER METHODS ====================
     
-    // ==================== TIMER METHODS ====================
-    
     setupTimer() {
-        const display = document.getElementById('timerDisplay');
-        if (display) {
-            this.updateTimerDisplay();
-        }
+        this.updateTimerDisplay();
         
-        // Timer control buttons
         document.getElementById('timerStartBtn').onclick = () => this.startTimer();
         document.getElementById('timerPauseBtn').onclick = () => this.pauseTimer();
         document.getElementById('timerResetBtn').onclick = () => this.resetTimer();
-        
-        // Preset buttons
         document.getElementById('setPomodoroBtn').onclick = () => this.setTimer(25 * 60);
         document.getElementById('setShortBreakBtn').onclick = () => this.setTimer(5 * 60);
         document.getElementById('setLongBreakBtn').onclick = () => this.setTimer(15 * 60);
-        
-        // Custom time button
         document.getElementById('setCustomTimeBtn').onclick = () => this.setCustomTime();
         
-        // Quick select buttons
         document.querySelectorAll('.quick-time').forEach(btn => {
             btn.onclick = () => {
                 const minutes = parseInt(btn.dataset.minutes);
-                if (!isNaN(minutes)) {
-                    this.setTimer(minutes * 60);
-                    this.showToast(`⏰ Timer set to ${minutes} minute${minutes !== 1 ? 's' : ''}`);
-                }
+                if (!isNaN(minutes)) this.setTimer(minutes * 60);
             };
         });
-        
-        // Add enter key support for custom time inputs
-        const customMinutes = document.getElementById('customMinutes');
-        const customSeconds = document.getElementById('customSeconds');
-        if (customMinutes) {
-            customMinutes.addEventListener('keypress', (e) => {
-                if (e.key === 'Enter') this.setCustomTime();
-            });
-        }
-        if (customSeconds) {
-            customSeconds.addEventListener('keypress', (e) => {
-                if (e.key === 'Enter') this.setCustomTime();
-            });
-        }
     }
 
     setCustomTime() {
-        const minutesInput = document.getElementById('customMinutes');
-        const secondsInput = document.getElementById('customSeconds');
-        
-        let minutes = parseInt(minutesInput.value) || 0;
-        let seconds = parseInt(secondsInput.value) || 0;
-        
-        // Validate inputs
-        minutes = Math.max(0, Math.min(180, minutes)); // Max 3 hours
+        let minutes = parseInt(document.getElementById('customMinutes').value) || 0;
+        let seconds = parseInt(document.getElementById('customSeconds').value) || 0;
+        minutes = Math.max(0, Math.min(180, minutes));
         seconds = Math.max(0, Math.min(59, seconds));
-        
         const totalSeconds = (minutes * 60) + seconds;
-        
-        if (totalSeconds === 0) {
-            this.showToast('Please enter a valid time (at least 1 second)');
-            return;
-        }
-        
-        this.setTimer(totalSeconds);
-        
-        // Update display to show what was set
-        const mins = Math.floor(totalSeconds / 60);
-        const secs = totalSeconds % 60;
-        this.showToast(`⏰ Timer set to ${mins} min${mins !== 1 ? 's' : ''}${secs > 0 ? ` ${secs} sec` : ''}`);
+        if (totalSeconds > 0) this.setTimer(totalSeconds);
+        else this.showToast('Please enter a valid time');
     }
 
     updateTimerDisplay() {
@@ -1092,109 +1215,9 @@ class StudyBuddy {
             const minutes = Math.floor(this.timerSeconds / 60);
             const seconds = this.timerSeconds % 60;
             display.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-            
-            // Update the custom time inputs to match current timer (if not running)
-            if (!this.timerRunning) {
-                const customMinutes = document.getElementById('customMinutes');
-                const customSeconds = document.getElementById('customSeconds');
-                if (customMinutes && customSeconds) {
-                    customMinutes.value = minutes;
-                    customSeconds.value = seconds;
-                }
-            }
         }
     }
 
-    startTimer() {
-        if (this.timerRunning) return;
-        
-        // Add visual feedback
-        const startBtn = document.getElementById('timerStartBtn');
-        if (startBtn) {
-            startBtn.style.transform = 'scale(0.95)';
-            setTimeout(() => { startBtn.style.transform = ''; }, 200);
-        }
-        
-        this.timerRunning = true;
-        this.timerInterval = setInterval(() => {
-            if (this.timerSeconds > 0) {
-                this.timerSeconds--;
-                this.updateTimerDisplay();
-                
-                // Optional: Update document title with remaining time
-                const minutes = Math.floor(this.timerSeconds / 60);
-                const seconds = this.timerSeconds % 60;
-                document.title = `(${minutes}:${seconds.toString().padStart(2, '0')}) StudyBuddy`;
-            } else {
-                this.pauseTimer();
-                this.timerComplete();
-            }
-        }, 1000);
-    }
-
-    timerComplete() {
-        // Reset document title
-        document.title = 'StudyBuddy · Cute Study Organizer';
-        
-        // Show notification
-        this.showToast('⏰ Time is up! Great job focusing! 🎉');
-        
-        // Try to play sound (optional - won't error if fails)
-        try {
-            const audio = new Audio('https://www.soundjay.com/misc/sounds/bell-ringing-05.mp3');
-            audio.play().catch(e => console.log('Audio not supported'));
-        } catch(e) {}
-        
-        // Flash the modal or add visual effect
-        const modal = document.getElementById('timerModal');
-        if (modal) {
-            modal.style.animation = 'none';
-            modal.offsetHeight; // Trigger reflow
-            modal.style.animation = null;
-        }
-    }
-
-    pauseTimer() {
-        this.timerRunning = false;
-        if (this.timerInterval) {
-            clearInterval(this.timerInterval);
-            this.timerInterval = null;
-        }
-        // Reset document title
-        document.title = 'StudyBuddy · Cute Study Organizer';
-    }
-
-    resetTimer() {
-        this.pauseTimer();
-        this.timerSeconds = 25 * 60;
-        this.updateTimerDisplay();
-        this.showToast('Timer reset to 25:00');
-    }
-
-    setTimer(seconds) {
-        this.pauseTimer();
-        this.timerSeconds = seconds;
-        this.updateTimerDisplay();
-        
-        // Show what was set
-        const minutes = Math.floor(seconds / 60);
-        const remainingSeconds = seconds % 60;
-        if (remainingSeconds > 0) {
-            this.showToast(`⏰ Timer set to ${minutes}:${remainingSeconds.toString().padStart(2, '0')}`);
-        } else {
-            this.showToast(`⏰ Timer set to ${minutes} minute${minutes !== 1 ? 's' : ''}`);
-        }
-    }
-    
-    updateTimerDisplay() {
-        const display = document.getElementById('timerDisplay');
-        if (display) {
-            const minutes = Math.floor(this.timerSeconds / 60);
-            const seconds = this.timerSeconds % 60;
-            display.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-        }
-    }
-    
     startTimer() {
         if (this.timerRunning) return;
         this.timerRunning = true;
@@ -1205,11 +1228,10 @@ class StudyBuddy {
             } else {
                 this.pauseTimer();
                 this.showToast('⏰ Time is up! Great job focusing! 🎉');
-                new Audio('https://www.soundjay.com/misc/sounds/bell-ringing-05.mp3').play().catch(e => console.log('Audio not supported'));
             }
         }, 1000);
     }
-    
+
     pauseTimer() {
         this.timerRunning = false;
         if (this.timerInterval) {
@@ -1217,17 +1239,19 @@ class StudyBuddy {
             this.timerInterval = null;
         }
     }
-    
+
     resetTimer() {
         this.pauseTimer();
         this.timerSeconds = 25 * 60;
         this.updateTimerDisplay();
     }
-    
+
     setTimer(seconds) {
         this.pauseTimer();
         this.timerSeconds = seconds;
         this.updateTimerDisplay();
+        const minutes = Math.floor(seconds / 60);
+        this.showToast(`⏰ Timer set to ${minutes} minutes`);
     }
     
     // ==================== UI METHODS ====================
@@ -1252,12 +1276,6 @@ class StudyBuddy {
         if (btn) {
             btn.innerHTML = isDark ? '<i class="fas fa-sun"></i> Light Mode' : '<i class="fas fa-moon"></i> Dark Mode';
         }
-        
-        // Force a re-render of current files to update their styles
-        if (this.selectedSubjectId) {
-            this.renderFiles();
-        }
-        
         this.showToast(isDark ? '🌙 Dark mode on' : '☀️ Light mode on');
     }
     
@@ -1265,24 +1283,13 @@ class StudyBuddy {
         document.addEventListener('keydown', (e) => {
             if (e.ctrlKey && e.key === 's') {
                 e.preventDefault();
-                const activeElement = document.activeElement;
-                if (activeElement && activeElement.tagName === 'TEXTAREA') {
-                    if (activeElement.id === 'subjectNotebook') this.saveSubjectNotebook();
-                    else if (activeElement.id === 'semesterNotebook') this.saveSemesterNotebook();
-                    else if (activeElement.classList?.contains('file-summary-input')) {
-                        const btn = activeElement.parentElement?.querySelector('.save-summary-btn');
-                        if (btn) btn.click();
-                    }
-                }
                 this.showToast('💾 Saved!');
             }
             if (e.ctrlKey && e.key === 'f') {
                 e.preventDefault();
                 document.getElementById('searchInput')?.focus();
             }
-            if (e.key === 'Escape') {
-                this.closeModals();
-            }
+            if (e.key === 'Escape') this.closeModals();
         });
     }
     
