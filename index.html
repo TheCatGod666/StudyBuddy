@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#f9a8d4">
+    <title>StudyBuddy · Cute Study Organizer</title>
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div class="container">
+    <div class="candy-header">
+        <div class="header-flex">
+            <div class="logo-area">
+                <div class="logo-icon">🐻‍❄️📘</div>
+                <div class="logo-text">
+                    <h1>StudyBuddy</h1>
+                    <p>✨ cozy semester hub ✨</p>
+                </div>
+            </div>
+            <div class="stats-candy">
+                <div class="stat-bubble"><span id="totalSemesters">0</span><small>semesters</small></div>
+                <div class="stat-bubble"><span id="totalSubjects">0</span><small>subjects</small></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="action-pills">
+        <button id="newSemesterBtn" class="pill-btn"><i class="fas fa-plus-circle"></i> New Semester</button>
+        <button id="exportDataBtn" class="pill-btn"><i class="fas fa-download"></i> Backup</button>
+        <button id="importDataBtn" class="pill-btn"><i class="fas fa-upload"></i> Restore</button>
+        <button id="viewNotebookSummaryBtn" class="pill-btn"><i class="fas fa-book"></i> 📓 View Notebook Summary</button>
+    </div>
+
+    <div class="main-grid-cute">
+        <!-- Left column: Semesters & Subjects -->
+        <div class="cute-card">
+            <div class="card-header-cute">
+                <h2><i class="fas fa-graduation-cap"></i> My Studies</h2>
+                <div class="semester-select-group">
+                    <select id="semesterSelector" class="cute-select"></select>
+                    <button id="deleteSemesterBtn" class="pill-btn" style="padding:0.4rem 1rem;"><i class="fas fa-trash-alt"></i></button>
+                    <button id="editSemesterBtn" class="pill-btn" style="padding:0.4rem 1rem;"><i class="fas fa-edit"></i></button>
+                </div>
+            </div>
+            <div id="subjectsList" class="subjects-scroll"></div>
+            <div class="add-subject-area">
+                <input type="text" id="newSubjectName" placeholder="e.g., Cozy Algorithms" class="cute-input">
+                <select id="completionType" class="cute-select">
+                    <option value="Exam only">📝 Exam only</option>
+                    <option value="Project only">📁 Project only</option>
+                    <option value="Exam + Project">🌟 Both</option>
+                </select>
+                <button id="addSubjectBtn" class="btn-gradient"><i class="fas fa-plus"></i> Add Subject</button>
+            </div>
+        </div>
+
+        <!-- Middle column: Subject Studio with TABS (Files + Subject Notebook) -->
+        <div class="cute-card">
+            <div class="card-header-cute">
+                <h2><i class="fas fa-folder-open"></i> Subject Studio</h2>
+            </div>
+            <div id="selectedSubjectInfo" class="info-placeholder">
+                <div style="text-align:center; padding:1rem;">🍬 pick a subject to start 🧸</div>
+            </div>
+            <div id="subjectFilesArea" style="display: none;">
+                <div class="tab-buttons">
+                    <button class="tab-btn active" data-tab="files-tab">📎 Files & Notes</button>
+                    <button class="tab-btn" data-tab="notebook-tab">📓 Subject Notebook</button>
+                </div>
+                
+                <div id="files-tab" class="tab-content active-tab">
+                    <div id="uploadZone" class="upload-zone-cute">
+                        <i class="fas fa-cloud-upload-alt fa-2x" style="color:#f472b6;"></i>
+                        <p>drag & drop files or click 📎</p>
+                        <small>pdf, ppt, images, code, txt ... unlimited storage!</small>
+                        <input type="file" id="fileUpload" multiple style="display:none;">
+                    </div>
+                    <div id="filesList" class="files-list-cute"></div>
+                    <div style="margin: 1rem 0;">
+                        <label style="font-weight:700;"><i class="fas fa-sticky-note"></i> Subject notes ✏️</label>
+                        <textarea id="subjectOverallNotes" rows="2" class="cute-input" style="width:100%; border-radius:30px;"></textarea>
+                        <button id="saveSubjectNotesBtn" class="pill-btn" style="background:#ffe2f0; margin-top:0.5rem;">Save Notes</button>
+                    </div>
+                    <button id="openFilesViewBtn" class="btn-gradient" style="background:#c084fc;"><i class="fas fa-layer-group"></i> View Files by Language</button>
+                </div>
+                
+                <div id="notebook-tab" class="tab-content">
+                    <div class="notebook-container">
+                        <div class="notebook-header">
+                            <span class="notebook-title"><i class="fas fa-pen-fancy"></i> 📝 My Subject Notebook</span>
+                            <button id="saveSubjectNotebookBtn" class="pill-btn" style="background:#e4f0ff;"><i class="fas fa-save"></i> Save Notes</button>
+                        </div>
+                        <textarea id="subjectNotebook" class="notebook-textarea" placeholder="✍️ Write your detailed study notes for this subject here...&#10;&#10;Capture key concepts, summaries from files, important formulas, or your own insights."></textarea>
+                        <div class="notebook-footer">
+                            <span><i class="far fa-clock"></i> Your personal subject notes</span>
+                            <span><i class="fas fa-feather-alt"></i> Write freely</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right column: Semester Insights with Global Semester Notebook -->
+        <div class="cute-card">
+            <div class="card-header-cute">
+                <h2><i class="fas fa-globe"></i> Semester Hub</h2>
+                <button id="generateSemesterSummaryBtn" class="pill-btn"><i class="fas fa-magic"></i> Generate</button>
+            </div>
+            
+            <!-- Global Semester Notebook (NEW) -->
+            <div class="semester-notebook-area">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.8rem;">
+                    <span style="font-weight: 800; color: #9d174d;"><i class="fas fa-book-open"></i> 📓 Semester Notebook</span>
+                    <button id="saveSemesterNotebookBtn" class="pill-btn" style="padding: 0.3rem 1rem; font-size: 0.75rem;"><i class="fas fa-save"></i> Save</button>
+                </div>
+                <textarea id="semesterNotebook" rows="4" class="cute-input" style="width:100%; border-radius:24px; font-family: monospace; font-size:0.85rem;" placeholder="Write your overall semester reflections, goals, or big-picture notes here..."></textarea>
+                <div class="notebook-footer" style="margin-top: 0.5rem;">
+                    <span>✨ Your global semester notebook</span>
+                </div>
+            </div>
+            
+            <div id="semesterSummary" class="summary-box">✨ Click "Generate" to see combined summary of all subjects, file notes, subject notes, and notebooks ✨</div>
+            <button id="exportSummaryBtn" class="pill-btn full-width" style="width:100%; margin-top:auto;"><i class="fas fa-file-export"></i> Export Summary</button>
+        </div>
+    </div>
+</div>
+
+<div id="fileViewerModal" class="modal-cute">
+    <div class="modal-card">
+        <div class="modal-header-cute"><h3 id="modalTitle">📄 File viewer</h3><button class="close-modal" id="closeModalBtn">&times;</button></div>
+        <div id="modalBody" style="padding:1.5rem; overflow:auto; max-height:70vh;"></div>
+    </div>
+</div>
+<div id="filesByLanguageModal" class="modal-cute">
+    <div class="modal-card" style="max-width:1000px;">
+        <div class="modal-header-cute"><h3 id="langModalTitle">📂 Files by Language</h3><button class="close-modal" id="closeLangModalBtn">&times;</button></div>
+        <div id="langModalBody" style="padding:1.5rem; max-height:70vh; overflow-y:auto;"></div>
+    </div>
+</div>
+<div id="toast" class="toast-cute">✨</div>
+
+<script src="script.js"></script>
+</body>
+</html>

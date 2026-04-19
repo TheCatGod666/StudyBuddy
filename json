@@ -1,0 +1,16 @@
+{
+    "name": "StudyHub",
+    "short_name": "StudyHub",
+    "description": "Smart semester organizer for students",
+    "start_url": ".",
+    "display": "standalone",
+    "theme_color": "#2c3e66",
+    "background_color": "#ffffff",
+    "icons": [
+        {
+            "src": "https://via.placeholder.com/192x192",
+            "sizes": "192x192",
+            "type": "image/png"
+        }
+    ]
+}
