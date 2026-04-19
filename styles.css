@@ -168,7 +168,13 @@ body::after { content: "🍬"; font-size: 100px; position: fixed; top: 20px; rig
 }
 
 .dark-mode .cute-card,
-.dark-mode .candy-header,
+.dark-mode .candy-header {
+    background: rgba(30, 30, 46, 0.95);
+    backdrop-filter: blur(14px);
+    color: #e0e0e0;
+    border-color: #2d2d44;
+}
+
 .dark-mode .upload-zone-cute,
 .dark-mode .file-card,
 .dark-mode .summary-box,
@@ -186,6 +192,11 @@ body::after { content: "🍬"; font-size: 100px; position: fixed; top: 20px; rig
     background: #2d2d44;
     color: #e0e0e0;
     border-color: #3d3d5c;
+}
+
+.dark-mode .cute-input::placeholder,
+.dark-mode .notebook-textarea::placeholder {
+    color: #888;
 }
 
 .dark-mode .subject-bubble {
@@ -247,6 +258,7 @@ body::after { content: "🍬"; font-size: 100px; position: fixed; top: 20px; rig
 
 .dark-mode .tab-btn {
     color: #c084fc;
+    background: transparent;
 }
 
 .dark-mode .tab-btn.active {
@@ -271,6 +283,10 @@ body::after { content: "🍬"; font-size: 100px; position: fixed; top: 20px; rig
 
 .dark-mode .stat-bubble small {
     color: #c084fc;
+}
+
+.dark-mode .search-container {
+    background: transparent;
 }
 
 .dark-mode .search-input {
@@ -303,6 +319,7 @@ body::after { content: "🍬"; font-size: 100px; position: fixed; top: 20px; rig
     background: linear-gradient(135deg, #f472b6, #c084fc);
     background-clip: text;
     -webkit-background-clip: text;
+    color: transparent;
 }
 
 .dark-mode .notebook-footer {
@@ -343,6 +360,7 @@ body::after { content: "🍬"; font-size: 100px; position: fixed; top: 20px; rig
 
 .dark-mode .timer-btn {
     background: rgba(0,0,0,0.3);
+    color: white;
 }
 
 .dark-mode .timer-btn:hover {
@@ -382,6 +400,10 @@ body::after { content: "🍬"; font-size: 100px; position: fixed; top: 20px; rig
     color: #888;
 }
 
+.dark-mode .file-card div {
+    color: #e0e0e0;
+}
+
 .dark-mode .summary-section {
     background: #2d2d44;
     border-bottom-color: #3d3d5c;
@@ -399,6 +421,47 @@ body::after { content: "🍬"; font-size: 100px; position: fixed; top: 20px; rig
     background: #2d2d44;
     color: #888;
     border-top-color: #3d3d5c;
+}
+
+.dark-mode .toast-cute {
+    background: #1e1a2f;
+    color: #ffe9f0;
+}
+
+.dark-mode .file-match-highlight {
+    background: #3d2d4a;
+    border-left-color: #f472b6;
+}
+
+.dark-mode .search-highlight {
+    background: #f59e0b;
+    color: #1a1a2e;
+}
+
+.dark-mode .info-placeholder {
+    color: #e0e0e0;
+}
+
+/* Fix for any remaining white backgrounds */
+.dark-mode textarea,
+.dark-mode input,
+.dark-mode select {
+    background: #2d2d44;
+    color: #e0e0e0;
+}
+
+.dark-mode .cute-card *,
+.dark-mode .candy-header * {
+    color: inherit;
+}
+
+/* Specific fix for file card text */
+.dark-mode .file-card small {
+    color: #c084fc;
+}
+
+.dark-mode .file-card .badge-completion {
+    background: #3d2d4a;
 }
 
 /* Study Timer */
@@ -890,4 +953,114 @@ html {
 /* Make sure highlighted text doesn't get saved as HTML */
 .file-summary-input:focus {
     outline: none;
+}
+
+/* Timer Modal Responsive Fixes */
+@media (max-width: 550px) {
+    .modal-card {
+        max-width: 95% !important;
+        width: 95% !important;
+    }
+    
+    .timer-display {
+        font-size: 2.5rem !important;
+    }
+    
+    .timer-btn {
+        padding: 6px 12px !important;
+        font-size: 0.8rem !important;
+    }
+    
+    .custom-time-picker input {
+        width: 65px !important;
+        font-size: 0.8rem;
+    }
+    
+    .custom-time-picker span {
+        font-size: 0.8rem;
+    }
+    
+    .pill-btn {
+        padding: 0.4rem 0.8rem !important;
+        font-size: 0.7rem !important;
+    }
+    
+    .quick-time {
+        padding: 0.25rem 0.6rem !important;
+        font-size: 0.65rem !important;
+    }
+    
+    .preset-quick-select {
+        padding: 0.6rem;
+    }
+}
+
+@media (max-width: 400px) {
+    .timer-controls {
+        gap: 0.3rem !important;
+    }
+    
+    .timer-btn {
+        padding: 4px 8px !important;
+        font-size: 0.7rem !important;
+    }
+    
+    .custom-time-picker {
+        padding: 0.6rem;
+    }
+    
+    .custom-time-picker input {
+        width: 55px !important;
+    }
+    
+    .quick-time {
+        padding: 0.2rem 0.5rem !important;
+        font-size: 0.6rem !important;
+    }
+}
+
+/* Make modal scrollable if content overflows */
+.modal-card {
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
+/* Timer container improvements */
+.timer-container {
+    padding: 1rem;
+}
+
+.timer-controls {
+    gap: 0.8rem;
+}
+
+/* Better button wrapping */
+.action-pills,
+.timer-controls,
+.custom-time-picker div,
+.preset-quick-select div {
+    justify-content: center;
+}
+
+/* Scrollbar for modal if needed */
+.modal-card::-webkit-scrollbar {
+    width: 6px;
+}
+
+.modal-card::-webkit-scrollbar-track {
+    background: #ffe2f0;
+    border-radius: 10px;
+}
+
+.modal-card::-webkit-scrollbar-thumb {
+    background: #f472b6;
+    border-radius: 10px;
+}
+
+.dark-mode .modal-card::-webkit-scrollbar-track {
+    background: #2d2d44;
+}
+
+.dark-mode .modal-card::-webkit-scrollbar-thumb {
+    background: #c084fc;
 }
