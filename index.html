@@ -8,6 +8,9 @@
     <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link rel="stylesheet" href="styles.css">
+    <!-- Add inside <head> -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=yes">
+    <meta name="format-detection" content="telephone=no">
 </head>
 <body>
 <div class="container">
@@ -27,11 +30,22 @@
         </div>
     </div>
 
+    <!-- Action buttons row -->
     <div class="action-pills">
         <button id="newSemesterBtn" class="pill-btn"><i class="fas fa-plus-circle"></i> New Semester</button>
         <button id="exportDataBtn" class="pill-btn"><i class="fas fa-download"></i> Backup</button>
         <button id="importDataBtn" class="pill-btn"><i class="fas fa-upload"></i> Restore</button>
         <button id="viewNotebookSummaryBtn" class="pill-btn"><i class="fas fa-book"></i> 📓 View Notebook Summary</button>
+        <button id="darkModeBtn" class="pill-btn"><i class="fas fa-moon"></i> Dark Mode</button>
+        <button id="timerBtn" class="pill-btn"><i class="fas fa-clock"></i> Study Timer</button>
+    </div>
+
+    <!-- Search Bar -->
+    <div class="cute-card" style="margin-bottom: 1rem;">
+        <div class="search-container">
+            <i class="fas fa-search search-icon"></i>
+            <input type="text" id="searchInput" class="search-input" placeholder="🔍 Search subjects, files, notes...">
+        </div>
     </div>
 
     <div class="main-grid-cute">
@@ -69,6 +83,14 @@
                 <div class="tab-buttons">
                     <button class="tab-btn active" data-tab="files-tab">📎 Files & Notes</button>
                     <button class="tab-btn" data-tab="notebook-tab">📓 Subject Notebook</button>
+                </div>
+
+                                <!-- Add this inside the files-tab div, above the filesList -->
+                <div class="file-search-container" style="margin-bottom: 1rem;">
+                    <div class="search-container" style="margin-bottom: 0;">
+                        <i class="fas fa-file-alt search-icon"></i>
+                        <input type="text" id="fileSearchInput" class="search-input" placeholder="🔍 Search files by name or notes...">
+                    </div>
                 </div>
                 
                 <div id="files-tab" class="tab-content active-tab">
@@ -110,7 +132,7 @@
                 <button id="generateSemesterSummaryBtn" class="pill-btn"><i class="fas fa-magic"></i> Generate</button>
             </div>
             
-            <!-- Global Semester Notebook (NEW) -->
+            <!-- Global Semester Notebook -->
             <div class="semester-notebook-area">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.8rem;">
                     <span style="font-weight: 800; color: #9d174d;"><i class="fas fa-book-open"></i> 📓 Semester Notebook</span>
@@ -128,18 +150,55 @@
     </div>
 </div>
 
+<!-- Timer Modal -->
+<div id="timerModal" class="modal-cute">
+    <div class="modal-card" style="max-width: 400px;">
+        <div class="modal-header-cute">
+            <h3>🍅 Study Timer</h3>
+            <button class="close-modal" id="closeTimerModalBtn">&times;</button>
+        </div>
+        <div style="padding: 2rem;">
+            <div class="timer-container">
+                <div class="timer-display" id="timerDisplay">25:00</div>
+                <div class="timer-controls">
+                    <button id="timerStartBtn" class="timer-btn">▶ Start</button>
+                    <button id="timerPauseBtn" class="timer-btn">⏸ Pause</button>
+                    <button id="timerResetBtn" class="timer-btn">🔄 Reset</button>
+                </div>
+            </div>
+            <div style="margin-top: 1rem; text-align: center;">
+                <button id="setPomodoroBtn" class="pill-btn">🍅 Pomodoro (25 min)</button>
+                <button id="setShortBreakBtn" class="pill-btn">☕ Short Break (5 min)</button>
+                <button id="setLongBreakBtn" class="pill-btn">🌸 Long Break (15 min)</button>
+            </div>
+            <p style="margin-top: 1rem; font-size: 12px; text-align: center; color: #888;">
+                Focus on your studies! Timer will notify you when time's up.
+            </p>
+        </div>
+    </div>
+</div>
+
+<!-- File Viewer Modal -->
 <div id="fileViewerModal" class="modal-cute">
     <div class="modal-card">
         <div class="modal-header-cute"><h3 id="modalTitle">📄 File viewer</h3><button class="close-modal" id="closeModalBtn">&times;</button></div>
         <div id="modalBody" style="padding:1.5rem; overflow:auto; max-height:70vh;"></div>
     </div>
 </div>
+
+<!-- Files by Language Modal -->
 <div id="filesByLanguageModal" class="modal-cute">
     <div class="modal-card" style="max-width:1000px;">
         <div class="modal-header-cute"><h3 id="langModalTitle">📂 Files by Language</h3><button class="close-modal" id="closeLangModalBtn">&times;</button></div>
         <div id="langModalBody" style="padding:1.5rem; max-height:70vh; overflow-y:auto;"></div>
     </div>
 </div>
+
+<!-- Keyboard Shortcuts Hint (no keyboard toggle, just info) -->
+<div class="shortcuts-hint" title="Shortcuts">
+    💡 Ctrl+S: Save | Ctrl+F: Search | Esc: Close
+</div>
+
 <div id="toast" class="toast-cute">✨</div>
 
 <script src="script.js"></script>
