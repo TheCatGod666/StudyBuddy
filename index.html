@@ -3,238 +3,236 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <meta name="theme-color" content="#f9a8d4">
-    <title>StudyBuddy · Cute Study Organizer</title>
-    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <title>StudyHub · Progress + Calendar</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <link rel="stylesheet" href="styles.css">
-    <!-- Add inside <head> -->
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=yes">
-    <meta name="format-detection" content="telephone=no">
 </head>
 <body>
-<div class="container">
-    <div class="candy-header">
-        <div class="header-flex">
-            <div class="logo-area">
-                <div class="logo-icon">🐻‍❄️📘</div>
-                <div class="logo-text">
-                    <h1>StudyBuddy</h1>
-                    <p>✨ cozy semester hub ✨</p>
+<div class="app">
+    <header class="header">
+        <div class="logo">
+            <i class="fas fa-brain"></i>
+            <span>StudyHub</span>
+            <span class="beta">progress + calendar</span>
+        </div>
+        <div class="stats">
+            <div><span id="totalSemesters">0</span><label>Semesters</label></div>
+            <div><span id="totalSubjects">0</span><label>Subjects</label></div>
+        </div>
+    </header>
+
+    <div class="toolbar">
+        <button id="newSemesterBtn"><i class="fas fa-plus-circle"></i> Semester</button>
+        <button id="exportDataBtn"><i class="fas fa-download"></i> Backup</button>
+        <button id="importDataBtn"><i class="fas fa-upload"></i> Restore</button>
+        <button id="viewNotebookSummaryBtn"><i class="fas fa-book-open"></i> All notes</button>
+        <button id="darkModeBtn"><i class="fas fa-moon"></i> Dark</button>
+        <button id="timerBtn"><i class="fas fa-clock"></i> Timer</button>
+    </div>
+
+    <div class="search-bar">
+        <i class="fas fa-search"></i>
+        <input type="text" id="searchInput" placeholder="Search subjects, files, notes...">
+    </div>
+
+    <div class="dashboard">
+        <!-- SEMESTER & SUBJECTS -->
+        <div class="card">
+            <div class="card-header">
+                <h2><i class="fas fa-graduation-cap"></i> Studies</h2>
+                <div class="semester-actions">
+                    <select id="semesterSelector"></select>
+                    <button id="editSemesterBtn" title="Edit semester"><i class="fas fa-pen"></i></button>
+                    <button id="deleteSemesterBtn" title="Delete semester"><i class="fas fa-trash"></i></button>
                 </div>
             </div>
-            <div class="stats-candy">
-                <div class="stat-bubble"><span id="totalSemesters">0</span><small>semesters</small></div>
-                <div class="stat-bubble"><span id="totalSubjects">0</span><small>subjects</small></div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Action buttons row -->
-    <div class="action-pills">
-        <button id="newSemesterBtn" class="pill-btn"><i class="fas fa-plus-circle"></i> New Semester</button>
-        <button id="exportDataBtn" class="pill-btn"><i class="fas fa-download"></i> Backup</button>
-        <button id="importDataBtn" class="pill-btn"><i class="fas fa-upload"></i> Restore</button>
-        <button id="viewNotebookSummaryBtn" class="pill-btn"><i class="fas fa-book"></i> 📓 View Notebook Summary</button>
-        <button id="darkModeBtn" class="pill-btn"><i class="fas fa-moon"></i> Dark Mode</button>
-        <button id="timerBtn" class="pill-btn"><i class="fas fa-clock"></i> Study Timer</button>
-    </div>
-
-    <!-- Search Bar -->
-    <div class="cute-card" style="margin-bottom: 1rem;">
-        <div class="search-container">
-            <i class="fas fa-search search-icon"></i>
-            <input type="text" id="searchInput" class="search-input" placeholder="🔍 Search subjects, files, notes...">
-        </div>
-    </div>
-
-    <div class="main-grid-cute">
-        <!-- Left column: Semesters & Subjects -->
-        <div class="cute-card">
-            <div class="card-header-cute">
-                <h2><i class="fas fa-graduation-cap"></i> My Studies</h2>
-                <div class="semester-select-group">
-                    <select id="semesterSelector" class="cute-select"></select>
-                    <button id="deleteSemesterBtn" class="pill-btn" style="padding:0.4rem 1rem;"><i class="fas fa-trash-alt"></i></button>
-                    <button id="editSemesterBtn" class="pill-btn" style="padding:0.4rem 1rem;"><i class="fas fa-edit"></i></button>
-                </div>
-            </div>
-            <div id="subjectsList" class="subjects-scroll"></div>
-            <div class="add-subject-area">
-                <input type="text" id="newSubjectName" placeholder="e.g., Cozy Algorithms" class="cute-input">
-                <select id="completionType" class="cute-select">
-                    <option value="Exam only">📝 Exam only</option>
-                    <option value="Project only">📁 Project only</option>
-                    <option value="Exam + Project">🌟 Both</option>
+            <div id="subjectsList" class="subjects-list"></div>
+            <div class="add-subject">
+                <input type="text" id="newSubjectName" placeholder="Subject name">
+                <select id="completionType">
+                    <option value="Exam only">Exam only</option>
+                    <option value="Project only">Project only</option>
+                    <option value="Exam + Project">Exam + project</option>
                 </select>
-                <button id="addSubjectBtn" class="btn-gradient"><i class="fas fa-plus"></i> Add Subject</button>
+                <button id="addSubjectBtn" class="btn-primary"><i class="fas fa-plus"></i> Add</button>
             </div>
         </div>
 
-        <!-- Middle column: Subject Studio with TABS (Files + Subject Notebook) -->
-        <div class="cute-card">
-            <div class="card-header-cute">
-                <h2><i class="fas fa-folder-open"></i> Subject Studio</h2>
-            </div>
-            <div id="selectedSubjectInfo" class="info-placeholder">
-                <div style="text-align:center; padding:1rem;">🍬 pick a subject to start 🧸</div>
-            </div>
+        <!-- SUBJECT STUDIO (FILES + NOTES) -->
+        <div class="card">
+            <div class="card-header"><h2><i class="fas fa-layer-group"></i> Subject studio</h2></div>
+            <div id="selectedSubjectInfo" class="placeholder-message">Select a subject to start</div>
             <div id="subjectFilesArea" style="display: none;">
-                <div class="tab-buttons">
-                    <button class="tab-btn active" data-tab="files-tab">📎 Files & Notes</button>
-                    <button class="tab-btn" data-tab="notebook-tab">📓 Subject Notebook</button>
+                <div class="tabs">
+                    <button class="tab active" data-tab="files-tab">Files & notes</button>
+                    <button class="tab" data-tab="notebook-tab">Subject notebook</button>
                 </div>
-
-                                <!-- Add this inside the files-tab div, above the filesList -->
-                <div class="file-search-container" style="margin-bottom: 1rem;">
-                    <div class="search-container" style="margin-bottom: 0;">
-                        <i class="fas fa-file-alt search-icon"></i>
-                        <input type="text" id="fileSearchInput" class="search-input" placeholder="🔍 Search files by name or notes...">
+                <div id="files-tab" class="tab-pane active">
+                    <div class="file-search">
+                        <i class="fas fa-search"></i>
+                        <input type="text" id="fileSearchInput" placeholder="Filter files...">
                     </div>
-                </div>
-                
-                <div id="files-tab" class="tab-content active-tab">
-                    <div id="uploadZone" class="upload-zone-cute">
-                        <i class="fas fa-cloud-upload-alt fa-2x" style="color:#f472b6;"></i>
-                        <p>drag & drop files or click 📎</p>
-                        <small>pdf, ppt, images, code, txt ... unlimited storage!</small>
+                    <div id="uploadZone" class="upload-area">
+                        <i class="fas fa-cloud-upload-alt"></i>
+                        <p>Drag & drop or click to upload</p>
                         <input type="file" id="fileUpload" multiple style="display:none;">
                     </div>
-                    <div id="filesList" class="files-list-cute"></div>
-                    <div style="margin: 1rem 0;">
-                        <label style="font-weight:700;"><i class="fas fa-sticky-note"></i> Subject notes ✏️</label>
-                        <textarea id="subjectOverallNotes" rows="2" class="cute-input" style="width:100%; border-radius:30px;"></textarea>
-                        <button id="saveSubjectNotesBtn" class="pill-btn" style="background:#ffe2f0; margin-top:0.5rem;">Save Notes</button>
+                    <div id="filesList" class="files-list"></div>
+                    <div class="note-block">
+                        <label><i class="fas fa-sticky-note"></i> Subject notes</label>
+                        <textarea id="subjectOverallNotes" rows="2" placeholder="Write general notes for this subject..."></textarea>
+                        <button id="saveSubjectNotesBtn" class="btn-secondary">Save notes</button>
                     </div>
-                    <button id="openFilesViewBtn" class="btn-gradient" style="background:#c084fc;"><i class="fas fa-layer-group"></i> View Files by Language</button>
+                    <button id="openFilesViewBtn" class="btn-accent full-width"><i class="fas fa-code-branch"></i> Browse by type</button>
                 </div>
-                
-                <div id="notebook-tab" class="tab-content">
+                <div id="notebook-tab" class="tab-pane">
                     <div class="notebook-container">
                         <div class="notebook-header">
-                            <span class="notebook-title"><i class="fas fa-pen-fancy"></i> 📝 My Subject Notebook</span>
-                            <button id="saveSubjectNotebookBtn" class="pill-btn" style="background:#e4f0ff;"><i class="fas fa-save"></i> Save Notes</button>
+                            <span><i class="fas fa-pen-fancy"></i> Personal notebook</span>
+                            <button id="saveSubjectNotebookBtn" class="btn-secondary">Save</button>
                         </div>
-                        <textarea id="subjectNotebook" class="notebook-textarea" placeholder="✍️ Write your detailed study notes for this subject here...&#10;&#10;Capture key concepts, summaries from files, important formulas, or your own insights."></textarea>
-                        <div class="notebook-footer">
-                            <span><i class="far fa-clock"></i> Your personal subject notes</span>
-                            <span><i class="fas fa-feather-alt"></i> Write freely</span>
-                        </div>
+                        <textarea id="subjectNotebook" rows="8" placeholder="Detailed study notes, formulas, key concepts..."></textarea>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Right column: Semester Insights with Global Semester Notebook -->
-        <div class="cute-card">
-            <div class="card-header-cute">
-                <h2><i class="fas fa-globe"></i> Semester Hub</h2>
-                <button id="generateSemesterSummaryBtn" class="pill-btn"><i class="fas fa-magic"></i> Generate</button>
+        <!-- SEMESTER HUB (GLOBAL NOTES + SUMMARY) -->
+        <div class="card">
+            <div class="card-header">
+                <h2><i class="fas fa-chalkboard"></i> Semester hub</h2>
+                <button id="generateSemesterSummaryBtn" class="btn-outline"><i class="fas fa-magic"></i> Generate</button>
             </div>
-            
-            <!-- Global Semester Notebook -->
-            <div class="semester-notebook-area">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.8rem;">
-                    <span style="font-weight: 800; color: #9d174d;"><i class="fas fa-book-open"></i> 📓 Semester Notebook</span>
-                    <button id="saveSemesterNotebookBtn" class="pill-btn" style="padding: 0.3rem 1rem; font-size: 0.75rem;"><i class="fas fa-save"></i> Save</button>
+            <div class="global-notebook">
+                <div class="global-header">
+                    <span><i class="fas fa-book"></i> Semester notebook</span>
+                    <button id="saveSemesterNotebookBtn" class="btn-secondary small">Save</button>
                 </div>
-                <textarea id="semesterNotebook" rows="4" class="cute-input" style="width:100%; border-radius:24px; font-family: monospace; font-size:0.85rem;" placeholder="Write your overall semester reflections, goals, or big-picture notes here..."></textarea>
-                <div class="notebook-footer" style="margin-top: 0.5rem;">
-                    <span>✨ Your global semester notebook</span>
-                </div>
+                <textarea id="semesterNotebook" rows="3" placeholder="Overall semester goals, reflections, or big-picture notes..."></textarea>
             </div>
-            
-            <div id="semesterSummary" class="summary-box">✨ Click "Generate" to see combined summary of all subjects, file notes, subject notes, and notebooks ✨</div>
-            <button id="exportSummaryBtn" class="pill-btn full-width" style="width:100%; margin-top:auto;"><i class="fas fa-file-export"></i> Export Summary</button>
+            <div id="semesterSummary" class="summary-preview">✨ Click "Generate" to build a full semester summary.</div>
+            <button id="exportSummaryBtn" class="btn-secondary full-width">Export summary (TXT)</button>
+        </div>
+
+        <!-- CALENDAR + DEADLINES CARD -->
+        <div class="card calendar-card">
+            <div class="card-header">
+                <h2><i class="fas fa-calendar-alt"></i> Deadlines & events</h2>
+                <button id="addEventBtn" class="btn-outline"><i class="fas fa-plus"></i> Add event</button>
+            </div>
+            <div class="calendar-nav">
+                <button id="prevMonthBtn"><i class="fas fa-chevron-left"></i></button>
+                <span id="currentMonthYear"></span>
+                <button id="nextMonthBtn"><i class="fas fa-chevron-right"></i></button>
+            </div>
+            <div class="calendar-weekdays">
+                <span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span><span>Sun</span>
+            </div>
+            <div id="calendarGrid" class="calendar-grid"></div>
+            <div class="upcoming-title"><i class="fas fa-list-ul"></i> Upcoming events</div>
+            <div id="upcomingList" class="upcoming-list"></div>
+        </div>
+
+        <!-- PROGRESS DASHBOARD CARD -->
+        <div class="card dashboard-card">
+            <div class="card-header">
+                <h2><i class="fas fa-chart-line"></i> Progress dashboard</h2>
+            </div>
+            <div id="subjectProgressList" class="progress-list"></div>
+            <div class="chart-container">
+                <canvas id="studyChart" width="400" height="200"></canvas>
+            </div>
+            <div class="dashboard-stats">
+                <span>🔥 Study streak: <span id="streakDays">0</span> days</span>
+                <span>📊 Total this week: <span id="totalWeekMins">0</span> min</span>
+            </div>
         </div>
     </div>
 </div>
 
-<!-- Timer Modal -->
-<div id="timerModal" class="modal-cute">
+<!-- TIMER MODAL -->
+<div id="timerModal" class="modal">
     <div class="modal-card">
-        <div class="modal-header-cute">
-            <h3>🍅 Study Timer</h3>
+        <div class="modal-header">
+            <h3><i class="fas fa-hourglass-half"></i> Focus timer</h3>
             <button class="close-modal" id="closeTimerModalBtn">&times;</button>
         </div>
-        <div style="padding: 20px;">
-            <div class="timer-container">
-                <div class="timer-display" id="timerDisplay">25:00</div>
-                <div class="timer-controls">
-                    <button id="timerStartBtn" class="timer-btn">▶ Start</button>
-                    <button id="timerPauseBtn" class="timer-btn">⏸ Pause</button>
-                    <button id="timerResetBtn" class="timer-btn">🔄 Reset</button>
+        <div class="modal-body">
+            <div class="timer-display" id="timerDisplay">25:00</div>
+            <div class="timer-buttons">
+                <button id="timerStartBtn" class="btn-primary">Start</button>
+                <button id="timerPauseBtn" class="btn-secondary">Pause</button>
+                <button id="timerResetBtn" class="btn-secondary">Reset</button>
+            </div>
+            <div class="custom-time">
+                <label>Custom timer</label>
+                <div class="time-inputs">
+                    <input type="number" id="customMinutes" placeholder="Min" value="25" min="0" max="180">
+                    <span>min</span>
+                    <input type="number" id="customSeconds" placeholder="Sec" value="0" min="0" max="59">
+                    <span>sec</span>
+                    <button id="setCustomTimeBtn" class="btn-accent">Set</button>
                 </div>
             </div>
-            
-            <div class="custom-time-picker">
-                <label><i class="fas fa-sliders-h"></i> Custom Time:</label>
-                <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
-                    <input type="number" id="customMinutes" class="cute-input" style="width: 80px;" placeholder="Min" value="25" min="1" max="180">
-                    <span>minutes</span>
-                    <input type="number" id="customSeconds" class="cute-input" style="width: 80px;" placeholder="Sec" value="0" min="0" max="59">
-                    <span>seconds</span>
-                    <button id="setCustomTimeBtn" class="pill-btn" style="background: #c084fc;">🎯 Set</button>
-                </div>
+            <div class="quick-presets">
+                <span>Quick:</span>
+                <button class="quick-time" data-minutes="5">5m</button>
+                <button class="quick-time" data-minutes="10">10m</button>
+                <button class="quick-time" data-minutes="15">15m</button>
+                <button class="quick-time" data-minutes="25">25m</button>
+                <button class="quick-time" data-minutes="30">30m</button>
+                <button class="quick-time" data-minutes="45">45m</button>
+                <button class="quick-time" data-minutes="60">60m</button>
             </div>
-            
-            <div style="margin: 15px 0; text-align: center;">
-                <div style="display: flex; gap: 8px; justify-content: center; flex-wrap: wrap;">
-                    <button id="setPomodoroBtn" class="pill-btn">🍅 Pomodoro (25 min)</button>
-                    <button id="setShortBreakBtn" class="pill-btn">☕ Short Break (5 min)</button>
-                    <button id="setLongBreakBtn" class="pill-btn">🌸 Long Break (15 min)</button>
-                </div>
-            </div>
-            
-            <div class="preset-quick-select">
-                <label style="font-weight: 600; font-size: 12px; color: #a855a7;">⚡ Quick Select:</label>
-                <div style="display: flex; gap: 5px; margin-top: 8px; flex-wrap: wrap; justify-content: center;">
-                    <button class="pill-btn quick-time" data-minutes="1">1m</button>
-                    <button class="pill-btn quick-time" data-minutes="5">5m</button>
-                    <button class="pill-btn quick-time" data-minutes="10">10m</button>
-                    <button class="pill-btn quick-time" data-minutes="15">15m</button>
-                    <button class="pill-btn quick-time" data-minutes="20">20m</button>
-                    <button class="pill-btn quick-time" data-minutes="25">25m</button>
-                    <button class="pill-btn quick-time" data-minutes="30">30m</button>
-                    <button class="pill-btn quick-time" data-minutes="45">45m</button>
-                    <button class="pill-btn quick-time" data-minutes="60">60m</button>
-                    <button class="pill-btn quick-time" data-minutes="90">90m</button>
-                    <button class="pill-btn quick-time" data-minutes="120">2h</button>
-                </div>
-            </div>
-            
-            <p style="margin-top: 15px; font-size: 11px; text-align: center; color: #888;">
-                <i class="fas fa-bell"></i> Timer will notify you when time's up!
-            </p>
         </div>
     </div>
 </div>
 
-<!-- File Viewer Modal -->
-<div id="fileViewerModal" class="modal-cute">
+<!-- EVENT MODAL -->
+<div id="eventModal" class="modal">
     <div class="modal-card">
-        <div class="modal-header-cute"><h3 id="modalTitle">📄 File viewer</h3><button class="close-modal" id="closeModalBtn">&times;</button></div>
-        <div id="modalBody" style="padding:1.5rem; overflow:auto; max-height:70vh;"></div>
-    </div>
-</div>
-
-<!-- Files by Language Modal -->
-<div id="filesByLanguageModal" class="modal-cute">
-    <div class="modal-card" style="max-width: 900px;">
-        <div class="modal-header-cute">
-            <h3 id="langModalTitle">📂 Files by Language</h3>
-            <button class="close-modal" id="closeLangModalBtn">&times;</button>
+        <div class="modal-header">
+            <h3 id="eventModalTitle">Add event</h3>
+            <button class="close-modal" id="closeEventModalBtn">&times;</button>
         </div>
-        <div id="langModalBody" style="padding: 1.5rem; max-height: 70vh; overflow-y: auto;"></div>
+        <div class="modal-body">
+            <input type="text" id="eventTitle" placeholder="Event title" class="full-input">
+            <select id="eventType">
+                <option value="exam">📝 Exam</option>
+                <option value="assignment">📄 Assignment</option>
+                <option value="study">📖 Study session</option>
+                <option value="other">⭐ Other</option>
+            </select>
+            <input type="date" id="eventDate" class="full-input">
+            <textarea id="eventNotes" rows="3" placeholder="Notes (optional)"></textarea>
+            <div class="modal-buttons">
+                <button id="saveEventBtn" class="btn-primary">Save</button>
+                <button id="deleteEventBtn" class="btn-danger" style="display:none;">Delete</button>
+            </div>
+        </div>
     </div>
 </div>
 
-<!-- Keyboard Shortcuts Hint (no keyboard toggle, just info) -->
-<div class="shortcuts-hint" title="Shortcuts">
-    💡 Ctrl+S: Save | Ctrl+F: Search | Esc: Close
+<!-- FILE VIEWER MODAL -->
+<div id="fileViewerModal" class="modal">
+    <div class="modal-card">
+        <div class="modal-header"><h3 id="modalTitle">File viewer</h3><button class="close-modal" id="closeModalBtn">&times;</button></div>
+        <div id="modalBody" class="modal-body"></div>
+    </div>
 </div>
 
-<div id="toast" class="toast-cute">✨</div>
+<!-- FILES BY TYPE MODAL -->
+<div id="filesByLanguageModal" class="modal">
+    <div class="modal-card wide">
+        <div class="modal-header"><h3>Files by type</h3><button class="close-modal" id="closeLangModalBtn">&times;</button></div>
+        <div id="langModalBody" class="modal-body"></div>
+    </div>
+</div>
+
+<div id="toast" class="toast"></div>
+<div class="shortcuts-hint"><i class="fas fa-keyboard"></i> Ctrl+S · Ctrl+F · Esc</div>
 
 <script src="script.js"></script>
 </body>
